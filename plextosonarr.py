@@ -1,11 +1,17 @@
 import requests
-import xml.etree.ElementTree as ET
 import json
+import xml.etree.ElementTree as ET
 
-def load_preferences():
-    with open('preferences.json') as f:
-        preferences = json.load(f)
-    return preferences['preferences']
+# Load preferences from preferences.json
+with open('preferences.json', 'r') as preferences_file:
+    preferences = json.load(preferences_file)
+
+# Define the base URLs and API keys
+PLEX_URL = f"{preferences['plex_url']}/status/sessions"
+PLEX_TOKEN = preferences['plex_token']
+SONARR_BASE_URL = f"{preferences['sonarr_url']}/api/v3"
+SONARR_API_KEY = preferences['sonarr_api_key']
+WATCHED_PERCENT = preferences.get('watched_percent', None)
 
 def get_plex_activity():
     response = requests.get(PLEX_URL, headers={'X-Plex-Token': PLEX_TOKEN})
@@ -16,9 +22,11 @@ def get_plex_activity():
                 series_name = video.get('grandparentTitle')
                 episode_name = video.get('title').replace("'", "")  # Remove single quotes
                 season_number = video.get('parentIndex')  # Extract season number
-                watched_percent = float(video.get('viewOffset', 0)) / float(video.get('duration', 1)) * 100
-                return series_name, season_number, episode_name, watched_percent
-    return None, None, None, None
+                view_offset = int(video.get('viewOffset', 0))
+                duration = int(video.get('duration', 1))
+                if (view_offset / duration) * 100 >= WATCHED_PERCENT:
+                    return series_name, season_number, episode_name
+    return None, None, None
 
 def get_series_id(series_name):
     response = requests.get(f"{SONARR_BASE_URL}/series", headers={'X-Api-Key': SONARR_API_KEY})
@@ -62,9 +70,8 @@ def trigger_episode_search_in_sonarr(episode_id):
         print("Failed to send download command to Sonarr.", response.text)
 
 def main():
-    preferences = load_preferences()
-    series_name, season_number, current_episode_name, watched_percent = get_plex_activity()
-    if series_name and season_number and current_episode_name and watched_percent >= preferences['watched_percent']:
+    series_name, season_number, current_episode_name = get_plex_activity()
+    if series_name and season_number and current_episode_name and WATCHED_PERCENT is not None:
         series_id = get_series_id(series_name)
         if series_id:
             print(f"Series found in Plex: {series_name}")

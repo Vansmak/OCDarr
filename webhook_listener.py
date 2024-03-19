@@ -8,7 +8,7 @@ def handle_plex_webhook():
     if request.method == 'POST':
         # Assuming the main functionality of your script is in a function called `main` within `next_episode.py`
         # Trigger your script or the specific function you need
-        subprocess.run(["python3", "next_episode.py"])
+        subprocess.run(["python3", "plextosonarr.py"])
         return 'Success', 200
 
 if __name__ == '__main__':

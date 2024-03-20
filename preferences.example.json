@@ -1,0 +1,11 @@
+{
+   "preferences": {
+       "plex_url": "http://localhost:32400",
+       "plex_token": "YOUR_PLEX_TOKEN_HERE",
+       "sonarr_url": "http://localhost:8989/api",
+       "sonarr_api_key": "YOUR_SONARR_API_KEY_HERE",
+       "watched_percent": 90,
+       "get_option": "episode",
+       "action_option": "search"
+    }
+}

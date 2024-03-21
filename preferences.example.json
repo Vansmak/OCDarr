@@ -6,6 +6,10 @@
        "sonarr_api_key": "YOUR_SONARR_API_KEY_HERE",
        "watched_percent": 90,
        "get_option": "episode",
-       "action_option": "search"
+       "action_option": "search",
+       "already_watched": "keep"
     }
 }
+
+
+

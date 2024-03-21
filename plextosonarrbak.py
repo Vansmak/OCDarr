@@ -12,7 +12,6 @@ PLEX_TOKEN = preferences.get('plex_token')
 SONARR_BASE_URL = preferences.get('sonarr_url') + '/api/v3'
 SONARR_API_KEY = preferences.get('sonarr_api_key')
 WATCHED_PERCENT = preferences.get('watched_percent', 90)  # Default to 90% if not specified
-ALREADY_WATCHED_ACTION = preferences.get('already_watched', 'keep')  # New preference
 
 def get_plex_activity():
     response = requests.get(PLEX_URL, headers={'X-Plex-Token': PLEX_TOKEN})
@@ -77,26 +76,6 @@ def monitor_episodes_in_sonarr(episode_ids):
         print(f"Episodes {episode_ids} set to monitored successfully.")
     else:
         print(f"Failed to set episodes {episode_ids} to monitored. Response: {response.text}")
-
-def find_episodes_to_delete(episode_details, current_episode_number):
-    # Find episodes earlier than (current episode number - 2)
-    episodes_before_target = [ep for ep in episode_details if ep['episodeNumber'] < int(current_episode_number) - 1]
-    return [ep['episodeFileId'] for ep in episodes_before_target if ep['episodeFileId'] > 0]
-
-def delete_episodes_in_sonarr(episode_file_ids):
-    for episode_file_id in episode_file_ids:
-        if episode_file_id:  # Make sure there's a file to delete
-            url = f"{SONARR_BASE_URL}/episodeFile/{episode_file_id}"
-            headers = {'X-Api-Key': SONARR_API_KEY}
-            response = requests.delete(url, headers=headers)
-             # Print the response status code and content for debugging
-            print(f"Deletion attempt for episodeFileId {episode_file_id}: HTTP {response.status_code}")
-            print(f"Response: {response.text}")
-            if response.ok:
-                print(f"Successfully deleted episode file with ID: {episode_file_id}")
-            else:
-                print(f"Failed to delete episode file with ID: {episode_file_id}")
-
 def main():
     series_name, season_number, current_episode_number = get_plex_activity()
     if series_name and season_number and current_episode_number:
@@ -104,33 +83,22 @@ def main():
         if series_id:
             episode_details = get_episode_details(series_id, season_number)
             if preferences['get_option'] == 'episode':
-                next_episode = find_next_episode(episode_details, current_episode_number)
-                if next_episode:
-                    if preferences['action_option'] == 'search':
+                if preferences['action_option'] == 'search':
+                    next_episode = find_next_episode(episode_details, current_episode_number)
+                    if next_episode:
                         trigger_episode_search_in_sonarr(next_episode['id'])
-                    elif preferences['action_option'] == 'monitor':
+                elif preferences['action_option'] == 'monitor':
+                    next_episode = find_next_episode(episode_details, current_episode_number)
+                    if next_episode:
                         monitor_episodes_in_sonarr([next_episode['id']])
-                
-                # Handle deletion based on the already_watched preference
-                if ALREADY_WATCHED_ACTION == "delete":
-                    episode_file_ids_to_delete = find_episodes_to_delete(episode_details, current_episode_number)
-                    if episode_file_ids_to_delete:
-                        delete_episodes_in_sonarr(episode_file_ids_to_delete)
-
-            
             elif preferences['get_option'] == 'season':
                 remaining_episodes = [ep for ep in episode_details if ep['episodeNumber'] > int(current_episode_number)]
                 remaining_episode_ids = [ep['id'] for ep in remaining_episodes]
                 if remaining_episode_ids:
                     monitor_episodes_in_sonarr(remaining_episode_ids)
-
-                # Season option does not involve deleting previous episodes based on the specification provided
-            else:
-                print("No valid 'get_option' preference found.")
     else:
         print("No active sessions found in Plex or unable to retrieve current activity.")
 
 if __name__ == "__main__":
     main()
-
 

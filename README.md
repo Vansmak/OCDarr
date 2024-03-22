@@ -8,7 +8,7 @@ This script is designed to automate the process of triggering a search for the n
 ### Clone the Repository
 Clone the repository to your local machine:
 ```
-git clone https://github.com/Vansmak/plextosonarr.git
+git clone https://github.com/Vansmak/tidiarr.git
 
 ```
 ### Install Dependencies \ optional

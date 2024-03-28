@@ -1,0 +1,37 @@
+body {
+    background-image: url('https://images.unsplash.com/photo-1439792675105-701e6a4ab6f0?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: top left;
+    background-repeat: repeat;
+    background-attachment: fixed; /* This makes the background non-scrollable */
+    color: #fff; /* Ensure text is white */
+    margin: 0;
+    padding: 0;
+}
+
+.series-item {
+    display: flex;
+    flex-direction: column; /* Adjust to stack items vertically */
+    align-items: center; /* Center items horizontally */
+    width: 100%; /* Ensure series item takes full width */
+    margin-bottom: 20px;
+}
+
+img {
+    width: 100%; /* Adjust to ensure image spans full width */
+    height: auto; /* Maintain aspect ratio */
+    opacity: 0.8; /* Adjust opacity as needed */
+}
+
+.episode-info {
+    text-align: center; /* Center-align the episode info */
+    margin-top: 5px;
+}
+
+.episode-info h2, .episode-info p {
+    margin: 5px 0; /* Uniform margin for top and bottom */
+    font-size: 16px; /* Adjusted font size */
+}
+.banner {
+    opacity: 0.6; /* Adjust opacity as needed */
+}

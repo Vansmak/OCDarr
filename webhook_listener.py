@@ -1,5 +1,6 @@
 import logging
-from flask import Flask, request
+from flask import Flask, render_template, request
+import sonarr_utils
 import subprocess
 
 # Configure logging
@@ -7,6 +8,12 @@ logging.basicConfig(level=logging.INFO, filename='/home/pi/tidiarr/app.log', fil
                     format='%(name)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
+
+@app.route('/')
+def home():
+    preferences = sonarr_utils.load_preferences()  # Make sure to load preferences
+    series_data = sonarr_utils.fetch_series_and_episodes(preferences)
+    return render_template('index.html', series_data=series_data)
 
 @app.route('/webhook', methods=['POST'])
 def handle_plex_webhook():

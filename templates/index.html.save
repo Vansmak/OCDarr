@@ -1,0 +1,10 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>Next Episodes</title> </head> 
+<body>
+    <h1>Upcoming Episodes</h1> <div id="episodes">Loading...</div> <script>
+        // JavaScript to fetch and display the next episodes from the Flask API
+        fetch('/api/next_episodes') .then(response => response.json()) .then(data => {
+                // Assuming 'data' is an array of episode info, adjust as needed
+                const episodesContent = data.map(ep => `<p>${ep.title} - ${ep.date}</p>`).join(''); 
+                document.getElementById('episodes').innerHTML = episodesContent;
+            });
+    </script> </body> </html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Series List</title>
+</head>
+<body>
+{% for series in series_data %}
+    <div class="series-item">
+        <a href="{{ series.sonarr_series_url }}" target="_blank">
+            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
+        </a>
+        <div class="episode-info">
+            <p>{{ series.latest_monitored_episode }}</p>
+        </div>
+    </div>
+{% endfor %}
+</body>
+</html>
+

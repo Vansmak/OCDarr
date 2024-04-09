@@ -42,8 +42,39 @@ def fetch_series_and_episodes(preferences):
                         'dateAdded': date_added
                     })
                     break  # Since we're only interested in the latest episode per series that meets the criteria
-
-    # Sort series by the most recently added episode
+    # Sort series and return only the top 6
     active_series.sort(key=lambda series: series['dateAdded'], reverse=True)
+    return active_series[:7]  # Return only the top 6 series
 
-    return active_series
+    
+def fetch_sonarr_activity(preferences):
+    activity_url = f"{preferences['sonarr_url']}/api/v3/history?page=1&pageSize=10&sortDir=desc"
+    headers = {'X-Api-Key': preferences['sonarr_api_key']}
+    response = requests.get(activity_url, headers=headers)
+    if response.ok:
+        activity_data = response.json().get('records', [])
+        return activity_data
+    return []
+   
+def fetch_upcoming_premieres(preferences):
+    series_url = f"{preferences['sonarr_url']}/api/v3/series"
+    headers = {'X-Api-Key': preferences['sonarr_api_key']}
+    upcoming_premieres = []
+
+    series_response = requests.get(series_url, headers=headers)
+    if series_response.ok:
+        series_list = series_response.json()
+        for series in series_list:
+            if 'nextAiring' in series:
+                # Convert and format the next airing date
+                next_airing_dt = datetime.fromisoformat(series['nextAiring'].replace('Z', '+00:00'))
+                formatted_date = next_airing_dt.strftime('%Y-%m-%d at %H:%M')
+                upcoming_premieres.append({
+                    'name': series['title'],
+                    'nextAiring': formatted_date,
+                    'artwork_url': f"{preferences['sonarr_url']}/api/v3/mediacover/{series['id']}/banner.jpg?apikey={preferences['sonarr_api_key']}",
+                    'sonarr_series_url': f"{preferences['sonarr_url']}/series/{series['titleSlug']}"
+                })
+
+    upcoming_premieres.sort(key=lambda x: x['nextAiring'])
+    return upcoming_premieres

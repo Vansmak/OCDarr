@@ -4,19 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script> <!-- Include JavaScript for toggle -->
     <title>Series List</title>
 </head>
 <body>
-{% for series in series_data %}
-    <div class="series-item">
-        <a href="{{ series.sonarr_series_url }}" target="_blank">
-            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
-        </a>
-        <div class="episode-info">
-            <p>{{ series.latest_monitored_episode }}</p>
-        </div>
+    <div class="menu">
+        <span onclick="showSection('current')" class="active">Watching</span>
+        <span onclick="showSection('upcoming')">Premiering</span>
     </div>
-{% endfor %}
+    
+    <div id="current">
+        {% for series in current_series %}
+        <div class="series-item">
+            <a href="{{ series.sonarr_series_url }}" target="_blank">
+                <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
+            </a>
+            <div class="episode-info">
+                <p>{{ series.latest_monitored_episode }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div id="upcoming" style="display: none;">
+        {% for premiere in upcoming_premieres %}
+        <div class="series-item">
+            <a href="{{ premiere.sonarr_series_url }}" target="_blank">
+                <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="banner">
+            </a>
+            <div class="episode-info">
+                <p>Premieres on: {{ premiere.nextAiring }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    
 </body>
 </html>
-

@@ -7,7 +7,7 @@ I created a script to integrate with plex (jellyfin) and sonarr to automate tv s
 - Provides flexibility to choose between episode-based or season-based actions.
 - Integrates with Plex webhooks for seamless operation during active sessions.
 - Optional HTML
-- works with plex, jellyfin needs to be tested
+- jellyfin needs to be tested
   ![watching](https://github.com/Vansmak/tidiarr/assets/16037573/068af13e-de0a-4b65-848e-bb709eb27a1d) ![premiering](https://github.com/Vansmak/tidiarr/assets/16037573/80483a6a-22f5-424d-8bd5-3586d2224d5d)
 
 

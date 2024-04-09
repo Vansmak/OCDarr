@@ -21,14 +21,15 @@ def home():
 
 
 @app.route('/webhook', methods=['POST'])
-def handle_plex_webhook():
-    logging.info("Received POST request from Plex")
+def handle_server_webhook():
+    logging.info("Received POST request from Server")
     try:
-        subprocess.run(["/usr/bin/python3", "/home/pi/tidiarr/plextosonarr.py"], capture_output=True, text=True)
-        logging.info("Successfully ran plextosonarr.py")
+        subprocess.run(["/usr/bin/python3", "/home/pi/tidiarr/servertosonarr.py"], capture_output=True, text=True)
+        logging.info("Successfully ran servertosonarr.py")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Failed to run plextosonarr.py: {e}")
+        logging.error(f"Failed to run servertosonarr.py: {e}")
     return 'Success', 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)  # Consider setting debug based on environment variable

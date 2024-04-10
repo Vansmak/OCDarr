@@ -50,9 +50,8 @@ docker build -t ocdarr .
 ## Usage
 Run the Docker Container: Run the Docker container with the appropriate environment variables:
 ```
-docker run -d --name ocdarr-container -p 5001:5001 \
--v /path/to/.env:/app/.env \
-ocdarr
+docker run -d -p 5001:5001 --env-file .env ocdarr-image
+
 ```
 Replace /path/to/.env with the path to your .env file containing configuration deta
 

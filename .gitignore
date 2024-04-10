@@ -3,4 +3,4 @@ venv/
 app.log
 preferences.json
 README.md
-
+.env

@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  sonarr_script:
+    build: .
+    environment:
+      - SERVER_TYPE
+      - SERVER_URL
+      - SERVER_TOKEN
+      - SONARR_URL
+      - SONARR_API_KEY
+      - WATCHED_PERCENT
+      - GET_OPTION
+      - ACTION_OPTION
+      - ALREADY_WATCHED
+    volumes:
+      - .:/app
+    ports:
+      - "5001:5001"
+    restart: unless-stopped
+

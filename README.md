@@ -63,10 +63,10 @@ docker-compose up --build -d
 #### Configure Plex Webhook
 In your Plex server settings, set up a webhook pointing to the Flask endpoint. This will notify the script whenever a new episode starts playing.
 
-Ensure to replace `/path/to/servertosonarr.py` with the actual path where your `servertosonarr.py` script is located on your system.
+Plex - Account settings - webhooks, example http://192.168.254.98:5001/webhook
 
 #### Sonarr Utils HTML Serving (Optional)
-If you prefer, you can use Sonarr Utils to serve HTML instead of Flask. This is useful if you already have a way to serve HTML or want to avoid using Flask.
+If you like, you can use Sonarr Utils to serve HTML. 
 
 ### Removing Sonarr Utils HTML Serving (Optional)
 If you prefer not to use Sonarr Utils for HTML serving, you can remove it from the webhook_listener code. Simply edit the `webhook_listener.py` file and remove the following lines:

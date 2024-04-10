@@ -1,18 +1,24 @@
-import json
+import os
 import requests
+from datetime import datetime
+from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 
-# Load preferences from preferences.json
-with open('preferences.json', 'r') as preferences_file:
-    preferences = json.load(preferences_file)['preferences']
+# Load environment variables from .env file
+load_dotenv()
 
-# Assign variables from preferences
-server_url = preferences.get('server_url')
-server_token = preferences.get('server_token')
-SONARR_BASE_URL = preferences.get('sonarr_url') + '/api/v3'
-SONARR_API_KEY = preferences.get('sonarr_api_key')
-WATCHED_PERCENT = preferences.get('watched_percent', 90)
-ALREADY_WATCHED_ACTION = preferences.get('already_watched', 'keep')
+# Configuration settings from environment variables
+server_type = os.getenv('SERVER_TYPE')
+server_url = os.getenv('SERVER_URL')
+server_token = os.getenv('SERVER_TOKEN')
+sonarr_url = os.getenv('SONARR_URL')
+sonarr_api_key = os.getenv('SONARR_API_KEY')
+watched_percent = int(os.getenv('WATCHED_PERCENT', '90'))
+get_option = os.getenv('GET_OPTION', 'episode')
+action_option = os.getenv('ACTION_OPTION', 'search')
+already_watched = os.getenv('ALREADY_WATCHED', 'keep')
+
+
 
 def get_server_activity(server_url, server_token, server_type):
     if server_type == 'plex':
@@ -107,52 +113,47 @@ def delete_episodes_in_sonarr(episode_file_ids):
 
 
 def main():
-    # Assign variables from preferences
-    server_url = preferences.get('server_url')
-    server_token = preferences.get('server_token')
-    server_type = preferences.get('server_type')
+    # Assign server type directly from environment variables
+    server_type = os.getenv('SERVER_TYPE')
 
-    if server_type == 'plex':
-        series_name, season_number, current_episode_number = get_server_activity(server_url, server_token, 'plex')
-    elif server_type == 'jellyfin':
-        series_name, season_number, current_episode_number = get_server_activity(server_url, server_token, 'jellyfin')
-    else:
-        print("Invalid server type specified in preferences.")
-        return
-
-    if series_name and season_number and current_episode_number:
-        series_id = get_series_id(series_name)
-        if series_id:
-            episode_details = get_episode_details(series_id, season_number)
-            
-            # Identify current, next, and episodes to delete
-            current_episode = next((ep for ep in episode_details if ep['episodeNumber'] == int(current_episode_number)), None)
-            next_episode = find_next_episode(episode_details, current_episode_number)
-            episodes_to_delete_ids = find_episodes_to_delete(episode_details, current_episode_number)
-            
-            # Unmonitor current episode
-            if current_episode and 'id' in current_episode:
-                unmonitor_episode_in_sonarr(current_episode['id'])
-            
-            # Monitor and search next episode
-            if next_episode and 'id' in next_episode:
-                monitor_episodes_in_sonarr([next_episode['id']])
-                if preferences['action_option'] in ['search', 'monitor']:
-                    trigger_episode_search_in_sonarr(next_episode['id'])
-            
-            # Delete episodes as per preference
-            if ALREADY_WATCHED_ACTION == "delete" and episodes_to_delete_ids:
-                delete_episodes_in_sonarr(episodes_to_delete_ids)
-            
-            elif preferences['get_option'] == 'season':
-                remaining_episodes = [ep for ep in episode_details if ep['episodeNumber'] > int(current_episode_number)]
-                remaining_episode_ids = [ep['id'] for ep in remaining_episodes if 'id' in ep]
-                if remaining_episode_ids:
-                    monitor_episodes_in_sonarr(remaining_episode_ids)
+    if server_type in ['plex', 'jellyfin']:
+        series_name, season_number, current_episode_number = get_server_activity(server_url, server_token, server_type)
+        
+        if series_name and season_number and current_episode_number:
+            series_id = get_series_id(series_name)
+            if series_id:
+                episode_details = get_episode_details(series_id, season_number)
+                
+                # Identify current, next, and episodes to delete
+                current_episode = next((ep for ep in episode_details if ep['episodeNumber'] == int(current_episode_number)), None)
+                next_episode = find_next_episode(episode_details, current_episode_number)
+                episodes_to_delete_ids = find_episodes_to_delete(episode_details, current_episode_number)
+                
+                # Unmonitor current episode
+                if current_episode and 'id' in current_episode:
+                    unmonitor_episode_in_sonarr(current_episode['id'])
+                
+                # Monitor and search next episode
+                if next_episode and 'id' in next_episode:
+                    monitor_episodes_in_sonarr([next_episode['id']])
+                    if ACTION_OPTION in ['search', 'monitor']:
+                        trigger_episode_search_in_sonarr(next_episode['id'])
+                
+                # Delete episodes as per preference
                 if ALREADY_WATCHED_ACTION == "delete" and episodes_to_delete_ids:
                     delete_episodes_in_sonarr(episodes_to_delete_ids)
+                
+                elif GET_OPTION == 'season':
+                    remaining_episodes = [ep for ep in episode_details if ep['episodeNumber'] > int(current_episode_number)]
+                    remaining_episode_ids = [ep['id'] for ep in remaining_episodes if 'id' in ep]
+                    if remaining_episode_ids:
+                        monitor_episodes_in_sonarr(remaining_episode_ids)
+                    if ALREADY_WATCHED_ACTION == "delete" and episodes_to_delete_ids:
+                        delete_episodes_in_sonarr(episodes_to_delete_ids)
+        else:
+            print("No active sessions found or unable to retrieve current activity.")
     else:
-        print("No active sessions found or unable to retrieve current activity.")
+        print("Invalid server type specified.")
 
 if __name__ == "__main__":
     main()

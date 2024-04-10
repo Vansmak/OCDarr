@@ -24,7 +24,7 @@ def home():
 def handle_server_webhook():
     logging.info("Received POST request from Server")
     try:
-        subprocess.run(["/usr/bin/python3", "/home/pi/tidiarr/servertosonarr.py"], capture_output=True, text=True)
+        subprocess.run(["/usr/bin/python3", "/home/pi/OCDarr/servertosonarr.py"], capture_output=True, text=True)
         logging.info("Successfully ran servertosonarr.py")
     except subprocess.CalledProcessError as e:
         logging.error(f"Failed to run servertosonarr.py: {e}")

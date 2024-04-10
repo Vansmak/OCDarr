@@ -20,7 +20,7 @@ This script is designed to automate the process of triggering a search for the n
 ### Clone the Repository
 Clone the repository to your local machine:
 ```
-git clone https://github.com/Vansmak/tidiarr.git
+git clone https://github.com/Vansmak/OCDarr.git
 
 ```
 ### Install Dependencies \ optional
@@ -76,7 +76,7 @@ pip install Flask
 #### Configure Plex Webhook
 In your Plex server settings, set up a webhook pointing to the Flask endpoint. This will notify the script whenever a new episode starts playing.
 
-Ensure to replace `/path/to/servertosonarr.py` with the actual path where your `plextosonarr.py` script is located on your system.
+Ensure to replace `/path/to/servertosonarr.py` with the actual path where your `servertosonarr.py` script is located on your system.
 
 #### Sonarr Utils HTML Serving (Optional)
 If you prefer, you can use Sonarr Utils to serve HTML instead of Flask. This is useful if you already have a way to serve HTML or want to avoid using Flask.

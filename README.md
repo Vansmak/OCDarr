@@ -41,7 +41,7 @@ git clone -b dev https://github.com/Vansmak/OCDarr.git
 ### Save the File
 After making your changes, save the file as `.env`.
 
-###Build the Docker Image: Navigate to the cloned repository directory and build the Docker image:
+###Either Build the Docker Image: Navigate to the cloned repository directory and build the Docker image:
 
 ```
 cd OCDarr
@@ -53,7 +53,10 @@ Run the Docker Container: Run the Docker container with the appropriate environm
 docker run -d -p 5001:5001 --env-file .env ocdarr-image
 
 ```
-Replace /path/to/.env with the path to your .env file containing configuration deta
+###Or use docker-compose.yml
+```
+docker-compose up --build -d
+```
 
 
 

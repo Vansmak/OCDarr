@@ -1,0 +1,13 @@
+{
+   "preferences": {
+       "server_type": "plexorjellyfin",
+       "server_url": "http://YOUR_PLEX_OR_JELLYFIN_URL",
+       "server_token": "YOUR_PLEX_OR_JELLYFIN_TOKEN_HERE",
+       "sonarr_url": "http://localhost:8989/api",
+       "sonarr_api_key": "YOUR_SONARR_API_KEY_HERE",
+       "watched_percent": 90,
+       "get_option": "episode",
+       "action_option": "search",
+       "already_watched": "keep"
+    }
+}

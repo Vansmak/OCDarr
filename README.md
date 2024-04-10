@@ -16,7 +16,7 @@ I created a script to integrate with plex (jellyfin) and sonarr to automate tv s
 This script is designed to automate the process of triggering a search for the next episode(s) and optionally delete of a TV series in Sonarr when the current episode is being played in Plex. It's particularly useful for managing older shows where you don't want to download entire seasons upfront, thus saving space and ensuring a seamless viewing experience.
 
 ## Installation
-
+#########recommend using docker branch https://github.com/Vansmak/OCDarr/tree/dev ######
 ### Clone the Repository
 Clone the repository to your local machine:
 ```

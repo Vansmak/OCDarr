@@ -1,17 +1,22 @@
 version: '3.8'
 services:
   sonarr_script:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - SERVER_TYPE
-      - SERVER_URL
-      - SERVER_TOKEN
-      - SONARR_URL
-      - SONARR_API_KEY
-      - WATCHED_PERCENT
-      - GET_OPTION
-      - ACTION_OPTION
-      - ALREADY_WATCHED
+      SERVER_TYPE: ${SERVER_TYPE?Variable not set}
+      SERVER_URL: ${SERVER_URL?Variable not set}
+      SERVER_TOKEN: ${SERVER_TOKEN?Variable not set}
+      SONARR_URL: ${SONARR_URL?Variable not set}
+      SONARR_API_KEY: ${SONARR_API_KEY?Variable not set}
+      WATCHED_PERCENT: ${WATCHED_PERCENT?Variable not set}
+      GET_OPTION: ${GET_OPTION?Variable not set}
+      ACTION_OPTION: ${ACTION_OPTION?Variable not set}
+      ALREADY_WATCHED: ${ALREADY_WATCHED?Variable not set}
+    env_file:
+      - .env
+
     volumes:
       - .:/app
       - ./logs:/app/logs

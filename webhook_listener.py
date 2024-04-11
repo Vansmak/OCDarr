@@ -10,10 +10,13 @@ app = Flask(__name__)
 # Load environment variables from .env file
 load_dotenv()
 
-# Setup logging
-logging.basicConfig(filename=os.getenv('LOG_PATH', '/app/logs/app.log'),
-                    level=logging.DEBUG if os.getenv('FLASK_DEBUG', 'false').lower() == 'true' else logging.INFO,
-                    format='%(asctime)s:%(levelname)s:%(message)s')
+# Setup logging to output to gunicorn's stderr
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.DEBUG if os.getenv('FLASK_DEBUG', 'false').lower() == 'true' else logging.INFO)
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+stream_handler.setFormatter(formatter)
+app.logger.addHandler(stream_handler)
+app.logger.setLevel(stream_handler.level)
 
 @app.route('/')
 def home():
@@ -21,7 +24,7 @@ def home():
     preferences = sonarr_utils.load_preferences()
     current_series = sonarr_utils.fetch_series_and_episodes(preferences)
     upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
-
+    
     # Render the index.html with the fetched data
     return render_template('index.html', current_series=current_series, upcoming_premieres=upcoming_premieres)
 
@@ -40,3 +43,4 @@ def handle_server_webhook():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')
+

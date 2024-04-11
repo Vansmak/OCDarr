@@ -1,5 +1,5 @@
 # Overview
-
+#########recommend using docker branch https://github.com/Vansmak/OCDarr/tree/dev ######
 I created a script to integrate with plex (jellyfin) and sonarr to automate tv show maintenance.  I am my only user so I like things to be tidy, as a watch a series this will always have the next episode ready and clean the previous ones.  If one prefers to keep episodes you can, if one prefers to get the full season you can. I use a plex webhook to trigger the script so anytime there is an active session in plex the script goes to work based on your preferences.  For example, my prefernces is if im watching breaking bad season 3 episode 3 then my script will unmonitor this episode and delete the one before it s3ep2, then monitor and search for season 3 episode 4 so it will be on deck. This way I always have the one I watched and the next one.  I also like a visual and feel many apps like trakt, tvtime etc are too busy. I like a basic look of whats next so included is an html using another script that I embed on my homarr page it shows me the latest episodes to watch and season or series premiering soon. 
 ## Features
 - Automatically triggers searches for the next episode in Sonarr based on your viewing progress.

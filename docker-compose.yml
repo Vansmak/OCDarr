@@ -10,16 +10,13 @@ services:
       SERVER_TOKEN: ${SERVER_TOKEN?Variable not set}
       SONARR_URL: ${SONARR_URL?Variable not set}
       SONARR_API_KEY: ${SONARR_API_KEY?Variable not set}
-      WATCHED_PERCENT: ${WATCHED_PERCENT?Variable not set}
-      GET_OPTION: ${GET_OPTION?Variable not set}
-      ACTION_OPTION: ${ACTION_OPTION?Variable not set}
-      ALREADY_WATCHED: ${ALREADY_WATCHED?Variable not set}
     env_file:
       - .env
 
     volumes:
       - .:/app
       - ./logs:/app/logs
+      - ./config:/app/config
     ports:
       - "5001:5001"
     restart: unless-stopped

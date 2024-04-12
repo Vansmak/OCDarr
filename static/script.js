@@ -1,20 +1,23 @@
-// script.js
 function showSection(section) {
-    const current = document.getElementById('current');
-    const upcoming = document.getElementById('upcoming');
-    const watchingTab = document.querySelector(".menu span:first-child");
-    const premieringTab = document.querySelector(".menu span:last-child");
+    const sections = {
+        current: document.getElementById('current'),
+        upcoming: document.getElementById('upcoming'),
+        settings: document.getElementById('settings')
+    };
+    const tabs = document.querySelectorAll('.menu span');
 
-    if (section === 'current') {
-        current.style.display = 'block';
-        upcoming.style.display = 'none';
-        watchingTab.classList.add('active');
-        premieringTab.classList.remove('active');
-    } else {
-        current.style.display = 'none';
-        upcoming.style.display = 'block';
-        watchingTab.classList.remove('active');
-        premieringTab.classList.add('active');
+    // Hide all sections and remove active class from all tabs
+    Object.values(sections).forEach(sec => sec.style.display = 'none');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    // Show the selected section and add active class to the clicked tab
+    if (sections[section]) {
+        sections[section].style.display = 'block';
+        document.querySelector(`.menu span[onclick="showSection('${section}')"]`).classList.add('active');
     }
 }
 
+// Optionally, set default section to 'current' on page load if no URL parameters are used
+document.addEventListener('DOMContentLoaded', () => {
+    showSection('current'); // or set based on URL parameters if needed
+});

@@ -75,3 +75,66 @@ img {
     padding: 5px;
     border-bottom: 1px solid #ccc;
 }
+/* General form styling */
+form {
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for form */
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px; /* Maximum width of the form */
+    margin: 20px auto; /* Centering the form */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.form-group {
+    margin-bottom: 20px; /* Space between form groups */
+}
+
+label {
+    display: block; /* Ensure the label uses its own line */
+    margin-bottom: 5px; /* Space below the label */
+    color: #FFF; /* White text color for readability */
+}
+
+input[type="text"], select {
+    width: 100%; /* Full width */
+    padding: 8px; /* Padding for input */
+    margin-top: 5px; /* Space between label and input */
+    border-radius: 4px; /* Rounded borders */
+    border: 1px solid #FFF; /* White border */
+    background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent white */
+    color: #FFF; /* Text color */
+}
+
+input[type="text"]:focus, select:focus {
+    outline: none; /* Removes default focus outline */
+    border-color: #00A7FF; /* Highlight color when focused */
+}
+
+button {
+    width: 100%; /* Full width for better mobile usability */
+    padding: 10px; /* Comfortable padding */
+    background-color: #00A7FF; /* Stylish button color */
+    color: #FFF; /* Text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded borders */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Slightly larger font for button */
+    margin-top: 10px; /* Space above the button */
+}
+
+button:hover {
+    background-color: #008ACF; /* Darker shade on hover for button */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+    form {
+        width: 100%; /* Full width on small screens */
+        padding: 15px; /* Slightly less padding on small screens */
+    }
+}
+
+select {
+    color: #000; /* Or any color that suits the theme */
+}

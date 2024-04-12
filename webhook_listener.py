@@ -37,7 +37,7 @@ def load_config():
             'action_option': 'search',
             'already_watched': 'keep',
             'always_keep': [],
-            'watched_percent': 90
+            'watched_percent': 90 #does not work at this point
         }
         save_config(default_config)
         return default_config
@@ -70,7 +70,7 @@ def update_settings():
     config['action_option'] = request.form.get('action_option', config['action_option'])
     config['already_watched'] = request.form.get('already_watched', config['already_watched'])
     config['always_keep'] = [normalize_name(name.strip()) for name in request.form.get('always_keep', '').split(',')]
-    config['watched_percent'] = int(request.form.get('watched_percent', config['watched_percent']))
+    config['watched_percent'] = int(request.form.get('watched_percent', config['watched_percent'])) #does not work at this point
     save_config(config)
     # Redirect back to the settings section with a success message
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

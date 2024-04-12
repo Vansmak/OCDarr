@@ -3,24 +3,35 @@ import requests
 import xml.etree.ElementTree as ET
 import logging
 import json
+from dotenv import load_dotenv
 
 # Load settings from a JSON configuration file
 def load_config():
-    with open('config.json', 'r') as file:
-        return json.load(file)
+    config_path = os.getenv('CONFIG_PATH', '/app/config/config.json')  # Ensure this path is correct
+    with open(config_path, 'r') as file:
+        config = json.load(file)
+    print("Loaded configuration:", config)  # Debug output
+    return config
 
 config = load_config()
+# Load environment variables
+load_dotenv()
 
-# Set global variables from the configuration file
-SERVER_TYPE = config['SERVER_TYPE']
-SERVER_URL = config['SERVER_URL']
-SERVER_TOKEN = config['SERVER_TOKEN']
-SONARR_URL = config['SONARR_URL']
-SONARR_API_KEY = config['SONARR_API_KEY']
-GET_OPTION = config['GET_OPTION']
-ACTION_OPTION = config['ACTION_OPTION']
-ALREADY_WATCHED = config['ALREADY_WATCHED']
-LOG_PATH = config.get('LOG_PATH', '/app/logs/app.log')
+# Define global variables based on environment settings
+SERVER_TYPE = os.getenv('SERVER_TYPE')
+SERVER_URL = os.getenv('SERVER_URL')
+SERVER_TOKEN = os.getenv('SERVER_TOKEN')
+SONARR_URL = os.getenv('SONARR_URL')
+SONARR_API_KEY = os.getenv('SONARR_API_KEY')
+LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
+
+
+# Set operation-specific settings from config file
+GET_OPTION = config['get_option']
+ACTION_OPTION = config['action_option']
+ALREADY_WATCHED = config['already_watched']
+WATCHED_PERCENT = config['watched_percent']  #does not work at this point
+ALWAYS_KEEP = config['always_keep'] 
 
 # Setup logging
 logging.basicConfig(filename=LOG_PATH, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -146,4 +157,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

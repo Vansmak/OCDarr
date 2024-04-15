@@ -1,6 +1,6 @@
 {
     "get_option": "episode",
-    "action_option": "search",
+    "action_option": "monitor",
     "already_watched": "delete",
     "watched_percent": 50,
     "always_keep": [

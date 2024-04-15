@@ -78,9 +78,24 @@ def get_episode_details(series_id, season_number):
     headers = {'X-Api-Key': SONARR_API_KEY}
     response = requests.get(url, headers=headers)
     if response.ok:
-        return response.json()
+        episode_details = response.json()
+        # Add series title to each episode
+        series_title = get_series_title(series_id)
+        for episode in episode_details:
+            episode['seriesTitle'] = series_title
+        return episode_details
     logging.error("Failed to fetch episode details.")
     return []
+
+def get_series_title(series_id):
+    """Fetch series title by series ID from Sonarr."""
+    url = f"{SONARR_URL}/api/v3/series/{series_id}"
+    headers = {'X-Api-Key': SONARR_API_KEY}
+    response = requests.get(url, headers=headers)
+    if response.ok:
+        return response.json()['title']
+    logging.error("Failed to fetch series title.")
+    return None
 
 def monitor_episodes(episode_ids, monitor=True):
     """Set episodes to monitored or unmonitored in Sonarr."""
@@ -107,7 +122,11 @@ def trigger_episode_search_in_sonarr(episode_ids):
 def find_episodes_to_delete(episode_details, current_episode_number):
     """Find episodes before the current episode to potentially delete, checking against 'always_keep'."""
     episodes_before_target = [ep for ep in episode_details if ep['episodeNumber'] < int(current_episode_number) - 1]
-    return [ep['episodeFileId'] for ep in episodes_before_target if ep['episodeFileId'] > 0 and ep['seriesTitle'] not in config['always_keep']]
+    episodes_to_delete = []
+    for ep in episodes_before_target:
+        if ep['episodeFileId'] > 0 and ep['seriesTitle'] not in ALWAYS_KEEP:
+            episodes_to_delete.append(ep['episodeFileId'])
+    return episodes_to_delete
 
 def delete_episodes_in_sonarr(episode_file_ids):
     """Delete specified episodes in Sonarr."""

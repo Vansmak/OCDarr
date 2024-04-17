@@ -19,5 +19,8 @@ function showSection(section) {
 
 // Optionally, set default section to 'current' on page load if no URL parameters are used
 document.addEventListener('DOMContentLoaded', () => {
-    showSection('current'); // or set based on URL parameters if needed
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get('section') || 'current';
+    showSection(section);
 });
+

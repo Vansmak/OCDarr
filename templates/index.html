@@ -4,20 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Series List</title>
+    <title>Series Manager</title>
 </head>
 <body>
-    <!-- Display the message if it exists -->
-    {% if message %}
-    <div class="alert alert-success">{{ message }}</div>
-    {% endif %}
-
     <div class="menu">
         <span onclick="showSection('current')" class="active">Watching</span>
         <span onclick="showSection('upcoming')">Premiering</span>
         <span onclick="showSection('settings')">Settings</span>
     </div>
-    
+
     <div id="current" style="display: block;">
         {% for series in current_series %}
         <div class="series-item">
@@ -30,7 +25,7 @@
         </div>
         {% endfor %}
     </div>
-    
+
     <div id="upcoming" style="display: none;">
         {% for premiere in upcoming_premieres %}
         <div class="series-item">
@@ -49,10 +44,7 @@
             <h3>Manage Settings</h3>
             <div class="form-group">
                 <label for="get_option">Fetch Episodes by:</label>
-                <select id="get_option" name="get_option">
-                    <option value="episode" {{ 'selected' if config.get('get_option') == 'episode' else '' }}>Single Episode</option>
-                    <option value="season" {{ 'selected' if config.get('get_option') == 'season' else '' }}>Entire Season</option>
-                </select>
+                <input type="text" id="get_option" name="get_option" placeholder="Enter 'Season' or number" value="{{ config.get('get_option', 'Season') }}">
             </div>
             <div class="form-group">
                 <label for="action_option">Action for Episodes:</label>
@@ -63,49 +55,45 @@
             </div>
             <div class="form-group">
                 <label for="already_watched">Handling Already Watched:</label>
-                <select id="already_watched" name="already_watched">
-                    <option value="keep" {{ 'selected' if config.get('already_watched') == 'keep' else '' }}>Keep Watched Episodes</option>
-                    <option value="delete" {{ 'selected' if config.get('already_watched') == 'delete' else '' }}>Delete Watched Episodes</option>
-                </select>
+                <input type="text" id="already_watched" name="already_watched" placeholder="Enter 'Season' or number" value="{{ config.get('already_watched', 'Season') }}">
             </div>
             <div class="form-group">
                 <label for="always_keep">Shows to Always Keep (comma-separated):</label>
                 <input type="text" id="always_keep" name="always_keep" placeholder="e.g., Show1, Show2" value="{{ ', '.join(config.get('always_keep', [])) }}">
             </div>
             <div class="form-group">
-                <label for="watched_percent">Watched Percentage Threshold(future_use):</label>
+                <label for="watched_percent">Watched Percentage Threshold:</label>
                 <input type="number" id="watched_percent" name="watched_percent" min="0" max="100" step="1" placeholder="Enter percentage" value="{{ config.get('watched_percent', 90) }}">
             </div>
             <button type="submit">Update Settings</button>
-        </form>
-    </div>
-    
-    
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var section = urlParams.get('section');
-            var message = urlParams.get('message');
-            if (section) {
-                showSection(section);
-            }
-            if (message && section === 'settings') {
-                var messageDiv = document.createElement('div');
-                messageDiv.className = 'alert alert-success';
-                messageDiv.textContent = message;
-                document.getElementById(section).prepend(messageDiv);
-            }
-        });
-    </script>
-    <script>
-        window.addEventListener('DOMContentLoaded', (event) => {
-            if (window.location.search.indexOf('message=') >= 0) {
-                let clean_uri = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                window.history.replaceState({}, document.title, clean_uri);
-            }
-        });
-    </script>
-    
+            </form>
+            </div>
+
+            <script src="{{ url_for('static', filename='script.js') }}"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var section = urlParams.get('section');
+                    var message = urlParams.get('message');
+                    if (section) {
+                        showSection(section);
+                    }
+                    if (message && section === 'settings') {
+                        var messageDiv = document.createElement('div');
+                        messageDiv.className = 'alert alert-success';
+                        messageDiv.textContent = message;
+                        document.getElementById
+                        (section).prepend(messageDiv);
+        }
+    });
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+        if (window.location.search.indexOf('message=') >= 0) {
+            let clean_uri = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, clean_uri);
+        }
+    });
+</script>
+
 </body>
 </html>

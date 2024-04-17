@@ -66,15 +66,37 @@ def settings():
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
     config = load_config()
-    config['get_option'] = request.form.get('get_option', config['get_option'])
-    config['action_option'] = request.form.get('action_option', config['action_option'])
-    config['already_watched'] = request.form.get('already_watched', config['already_watched'])
-    config['always_keep'] = [normalize_name(name.strip()) for name in request.form.get('always_keep', '').split(',')]
-    config['watched_percent'] = int(request.form.get('watched_percent', config['watched_percent'])) #does not work at this point
-    save_config(config)
+    
+    # Update the configuration with form data
+    get_option = request.form.get('get_option')
+    if get_option.isdigit():  # If it's a number, convert to int
+        config['get_option'] = int(get_option)
+    else:
+        config['get_option'] = get_option  # Otherwise, save as string
+
+    action_option = request.form.get('action_option')
+    config['action_option'] = action_option
+
+    already_watched = request.form.get('already_watched')
+    if already_watched.isdigit():  # Handling numbers for episodes to keep
+        config['already_watched'] = int(already_watched)
+    else:
+        config['already_watched'] = already_watched
+
+    always_keep = request.form.get('always_keep', '').split(',')
+    config['always_keep'] = [normalize_name(name.strip()) for name in always_keep if name.strip()]  # Normalize and save
+
+    watched_percent = request.form.get('watched_percent')
+    if watched_percent:
+        config['watched_percent'] = int(watched_percent)
+
+    save_config(config)  # Save the updated configuration
+
     # Redirect back to the settings section with a success message
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return redirect(url_for('home', section='settings', message=f"Settings updated successfully on {current_time}"))
+
+
 
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():

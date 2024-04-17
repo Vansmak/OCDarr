@@ -1,7 +1,7 @@
 {
-    "get_option": "episode",
-    "action_option": "monitor",
-    "already_watched": "delete",
+    "get_option": 1,
+    "action_option": "search",
+    "already_watched": 2,
     "watched_percent": 50,
     "always_keep": [
         "Fallout"

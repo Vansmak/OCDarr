@@ -27,12 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 
 # Define environment variables for runtime
-ENV SERVER_URL=http://example.com \
-    SERVER_TOKEN=token_here \
-    SONARR_URL=http://sonarr.example.com \
+ENV SONARR_URL=http://sonarr.example.com \
     SONARR_API_KEY=apikey_here \
-    WATCHED_PERCENT=90 \
-    ALREADY_WATCHED=keep \
     LOG_PATH=/app/logs/app.log
 
 # Create a directory for logs

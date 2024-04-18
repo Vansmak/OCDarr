@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import subprocess
 import os
 import logging
@@ -36,8 +36,8 @@ def load_config():
             'get_option': 'episode',
             'action_option': 'search',
             'already_watched': 'keep',
-            'always_keep': [],
-            'watched_percent': 90 #does not work at this point
+            'always_keep': []
+            
         }
         save_config(default_config)
         return default_config
@@ -86,9 +86,7 @@ def update_settings():
     always_keep = request.form.get('always_keep', '').split(',')
     config['always_keep'] = [normalize_name(name.strip()) for name in always_keep if name.strip()]  # Normalize and save
 
-    watched_percent = request.form.get('watched_percent')
-    if watched_percent:
-        config['watched_percent'] = int(watched_percent)
+    
 
     save_config(config)  # Save the updated configuration
 
@@ -100,15 +98,29 @@ def update_settings():
 
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
-    app.logger.info("Received POST request from Server")
-    try:
-        result = subprocess.run(["python3", "/app/servertosonarr.py"], capture_output=True, text=True)
-        app.logger.info("Successfully ran servertosonarr.py: " + result.stdout)
-        if result.stderr:
-            app.logger.error("Errors from servertosonarr.py: " + result.stderr)
-    except subprocess.CalledProcessError as e:
-        app.logger.error(f"Failed to run servertosonarr.py: {e}")
-    return 'Success', 200
+    app.logger.info("Received POST request from Tautulli")
+    data = request.json  # Assuming data is properly formatted JSON from Tautulli
+
+    if data:
+        app.logger.info(f"Webhook received with data: {data}")
+        try:
+            # Write the received data to a temporary file
+            with open('/app/temp/data_from_tautulli.json', 'w') as f:
+                json.dump(data, f)
+            app.logger.info("Data successfully written to data_from_tautulli.json")
+
+            # Trigger the script processing
+            result = subprocess.run(["python3", "/app/servertosonarr.py"], capture_output=True, text=True)
+            app.logger.info("Successfully ran servertosonarr.py: " + result.stdout)
+            if result.stderr:
+                app.logger.error("Errors from servertosonarr.py: " + result.stderr)
+        except Exception as e:
+            app.logger.error(f"Failed to handle data or run script: {e}")
+            return jsonify({'status': 'error', 'message': str(e)}), 500
+        return jsonify({'status': 'success', 'message': 'Script triggered successfully'}), 200
+    else:
+        app.logger.error("No data received from webhook")
+        return jsonify({'status': 'error', 'message': 'No data received'}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')

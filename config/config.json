@@ -1,8 +1,7 @@
 {
     "get_option": 1,
     "action_option": "search",
-    "already_watched": 2,
-    "watched_percent": 50,
+    "already_watched": 1,
     "always_keep": [
         "Fallout"
     ]

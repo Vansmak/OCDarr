@@ -18,9 +18,7 @@ config = load_config()
 load_dotenv()
 
 # Define global variables based on environment settings
-SERVER_TYPE = os.getenv('SERVER_TYPE')
-SERVER_URL = os.getenv('SERVER_URL')
-SERVER_TOKEN = os.getenv('SERVER_TOKEN')
+
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
@@ -37,30 +35,18 @@ ALWAYS_KEEP = config['always_keep']
 logging.basicConfig(filename=LOG_PATH, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def parse_plex_response(content):
-    """Parse XML content from Plex webhook."""
-    try:
-        root = ET.fromstring(content)
-        for video in root.iter('Video'):
-            if video.get('type') == 'episode':
-                grandparentTitle = video.get('grandparentTitle')
-                parentIndex = int(video.get('parentIndex')) if video.get('parentIndex') else None
-                index = int(video.get('index')) if video.get('index') else None
-                return grandparentTitle, parentIndex, index
-    except ET.ParseError as e:
-        logging.error(f"XML parsing error: {str(e)}")
-    return None, None, None  # Ensure three values are always returned
-
 def get_server_activity():
-    """Fetch current viewing details from Plex or Jellyfin."""
-    headers = {'X-Plex-Token': SERVER_TOKEN} if SERVER_TYPE == 'plex' else {'Authorization': f'Bearer {SERVER_TOKEN}'}
-    activity_url = f"{SERVER_URL}/status/sessions" if SERVER_TYPE == 'plex' else f"{SERVER_URL}/sessions"
-    response = requests.get(activity_url, headers=headers)
-    if response.ok:
-        return parse_plex_response(response.content)
-    else:
-        logging.error(f"Failed to fetch current activity. Status Code: {response.status_code}")
-    return None, None, None  # Default return if the response is not okay
+    """Read current viewing details from Tautulli webhook stored data."""
+    try:
+        with open('/app/temp/data_from_tautulli.json', 'r') as file:
+            data = json.load(file)
+        grandparent_title = data['grandparent_title']
+        parent_media_index = int(data['parent_media_index'])
+        media_index = int(data['media_index'])
+        return grandparent_title, parent_media_index, media_index
+    except Exception as e:
+        logging.error(f"Failed to read or parse data from Tautulli webhook: {str(e)}")
+    return None, None, None
 
 
 

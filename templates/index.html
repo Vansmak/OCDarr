@@ -61,10 +61,7 @@
                 <label for="always_keep">Shows to Always Keep (comma-separated):</label>
                 <input type="text" id="always_keep" name="always_keep" placeholder="e.g., Show1, Show2" value="{{ ', '.join(config.get('always_keep', [])) }}">
             </div>
-            <div class="form-group">
-                <label for="watched_percent">Watched Percentage Threshold:</label>
-                <input type="number" id="watched_percent" name="watched_percent" min="0" max="100" step="1" placeholder="Enter percentage" value="{{ config.get('watched_percent', 90) }}">
-            </div>
+           
             <button type="submit">Update Settings</button>
             </form>
             </div>

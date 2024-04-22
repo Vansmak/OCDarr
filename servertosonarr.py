@@ -36,14 +36,14 @@ logging.basicConfig(filename=LOG_PATH, level=logging.DEBUG, format='%(asctime)s 
 
 
 def get_server_activity():
-    """Read current viewing details from Tautulli webhook stored data."""
+    """Read current viewing details from Tautulli webhook stored data, using the updated labels."""
     try:
         with open('/app/temp/data_from_tautulli.json', 'r') as file:
             data = json.load(file)
-        grandparent_title = data['grandparent_title']
-        parent_media_index = int(data['parent_media_index'])
-        media_index = int(data['media_index'])
-        return grandparent_title, parent_media_index, media_index
+        series_title = data['plex_title']  # Updated to use plex_title
+        season_number = int(data['plex_season_num'])  # Updated to use plex_season_num
+        episode_number = int(data['plex_ep_num'])  # Updated to use plex_ep_num
+        return series_title, season_number, episode_number
     except Exception as e:
         logging.error(f"Failed to read or parse data from Tautulli webhook: {str(e)}")
     return None, None, None
@@ -162,31 +162,33 @@ def main():
         if series_id:
             current_season_episodes = get_episode_details(series_id, season_number)
             if current_season_episodes:
-                # Filter out episodes that are already past
-                remaining_current_season = [ep for ep in current_season_episodes if ep['episodeNumber'] > episode_number]
+                # Unmonitor all episodes watched up to the current one
+                unmonitor_ids = [ep['id'] for ep in current_season_episodes if ep['episodeNumber'] <= episode_number]
+                logging.debug(f"IDs to unmonitor: {unmonitor_ids}")  # Debugging statement
+                unmonitor_episodes(unmonitor_ids)  # Unmonitor episodes based on the IDs
 
-                # Calculate how many more episodes to fetch based on GET_OPTION
-                episodes_needed = config['get_option'] - len(remaining_current_season)
-                next_episode_ids = [ep['id'] for ep in remaining_current_season][:config['get_option']]
-
-                # Fetch episodes from next season if more are needed
-                if episodes_needed > 0:
-                    next_season_episodes = get_episode_details(series_id, season_number + 1)
-                    # Only add as many episodes as needed to fulfill the get_option requirement
-                    additional_episodes_needed = config['get_option'] - len(next_episode_ids)
-                    next_episode_ids.extend([ep['id'] for ep in next_season_episodes][:additional_episodes_needed])
-
-                monitor_episodes(next_episode_ids, monitor=True)
-                trigger_episode_search_in_sonarr(next_episode_ids)
-
-                # Handling deletions and unmonitoring based on configuration
+                # Handling deletions based on configuration
                 keep_ids = determine_keep_ids(current_season_episodes, episode_number, config['already_watched'], config['always_keep'])
                 episodes_to_delete = find_episodes_to_delete(current_season_episodes, episode_number)
-                episodes_to_delete = [ep for ep in episodes_to_delete if ep not in keep_ids]
+                episodes_to_delete = [ep for ep in episodes_to_delete if ep['id'] not in keep_ids]
                 delete_episodes_in_sonarr(episodes_to_delete)
+
+                # Handling future episodes: monitor and potentially search based on ACTION_OPTION
+                remaining_current_season = [ep for ep in current_season_episodes if ep['episodeNumber'] > episode_number]
+                episodes_needed = config['get_option'] - len(remaining_current_season)
+                next_episode_ids = [ep['id'] for ep in remaining_current_season][:config['get_option']]
                 
-                unmonitor_ids = [ep['id'] for ep in current_season_episodes if ep['id'] not in keep_ids]
-                unmonitor_episodes(unmonitor_ids)
+                if episodes_needed > 0:
+                    next_season_episodes = get_episode_details(series_id, season_number + 1)
+                    if next_season_episodes:
+                        additional_episodes_needed = config['get_option'] - len(next_episode_ids)
+                        next_episode_ids.extend([ep['id'] for ep in next_season_episodes][:additional_episodes_needed])
+                    else:
+                        logging.info(f"No more seasons available after season {season_number} for series {series_name}.")
+
+                monitor_episodes(next_episode_ids, monitor=True)
+                if config['action_option'] == "search":
+                    trigger_episode_search_in_sonarr(next_episode_ids)
 
             else:
                 logging.info("No episodes found for the current series and season.")
@@ -197,3 +199,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

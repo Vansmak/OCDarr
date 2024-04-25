@@ -8,37 +8,61 @@
 </head>
 <body>
     <div class="menu">
-        <span onclick="showSection('current')" class="active">Watching</span>
+        <span onclick="showSection('current')" class="active">Plex</span>
+        <span onclick="showSection('prime')">Prime</span>
         <span onclick="showSection('upcoming')">Premiering</span>
         <span onclick="showSection('settings')">Settings</span>
     </div>
 
     <div id="current" style="display: block;">
-        {% for series in current_series %}
-        <div class="series-item">
-            <a href="{{ series.sonarr_series_url }}" target="_blank">
-                <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
-            </a>
-            <div class="episode-info">
-                <p>{{ series.latest_monitored_episode }}</p>
+        {% if current_series %}
+            {% for series in current_series %}
+            <div class="series-item">
+                <a href="{{ series.sonarr_series_url }}" target="_blank">
+                    <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
+                </a>
+                <div class="episode-info">
+                    <p>{{ series.latest_monitored_episode }}</p>
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>Unable to load series. Check Sonarr status.</p>
+        {% endif %}
+    </div>
+
+    <div id="prime" style="display: none;">
+        {% if prime_series %}
+            {% for series in prime_series %}
+            <div class="series-item">
+                <a href="{{ series.sonarr_series_url }}" target="_blank">
+                    <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
+                </a>
+                <p>{{ series.name }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No prime series available.</p>
+        {% endif %}
     </div>
 
     <div id="upcoming" style="display: none;">
-        {% for premiere in upcoming_premieres %}
-        <div class="series-item">
-            <a href="{{ premiere.sonarr_series_url }}" target="_blank">
-                <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="banner">
-            </a>
-            <div class="episode-info">
-                <p>Premieres on: {{ premiere.nextAiring }}</p>
+        {% if upcoming_premieres %}
+            {% for premiere in upcoming_premieres %}
+            <div class="series-item">
+                <a href="{{ premiere.sonarr_series_url }}" target="_blank">
+                    <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="banner">
+                </a>
+                <div class="episode-info">
+                    <p>Premieres on: {{ premiere.nextAiring }}</p>
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>No upcoming premieres available.</p>
+        {% endif %}
     </div>
-
+    
     <div id="settings" style="display: none;">
         <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
             <h3>Manage Settings</h3>
@@ -61,36 +85,28 @@
                 <label for="always_keep">Shows to Always Keep (comma-separated):</label>
                 <input type="text" id="always_keep" name="always_keep" placeholder="e.g., Show1, Show2" value="{{ ', '.join(config.get('always_keep', [])) }}">
             </div>
-           
             <button type="submit">Update Settings</button>
-            </form>
-            </div>
+        </form>
+    
+        <h3>View Logs</h3>
+        <pre id="logContent">Click a button to load logs...</pre>
+        <button onclick="fetchLogs('app')">View App Logs</button>
+        <button onclick="fetchLogs('error')">View Error Logs</button>
+        <button onclick="hideLogs()">Close Logs</button>
+        <a href="/logs?type=app" download class="log-link">Download App Logs</a>
+        <a href="/logs?type=error" download class="log-link">Download Error Logs</a>
+    
+        <div class="form-group">
+            <button onclick="location.href='http://192.168.254.85:8989/add/new';">Add new show</button>
+        </div>
+        <!-- HTML button calling the JavaScript function on click -->
+        <div class="form-group">
+            <button onclick="triggerWake();">Wake Office PC</button>
+        </div>
+    </div>
+    
 
-            <script src="{{ url_for('static', filename='script.js') }}"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var urlParams = new URLSearchParams(window.location.search);
-                    var section = urlParams.get('section');
-                    var message = urlParams.get('message');
-                    if (section) {
-                        showSection(section);
-                    }
-                    if (message && section === 'settings') {
-                        var messageDiv = document.createElement('div');
-                        messageDiv.className = 'alert alert-success';
-                        messageDiv.textContent = message;
-                        document.getElementById
-                        (section).prepend(messageDiv);
-        }
-    });
-
-    window.addEventListener('DOMContentLoaded', (event) => {
-        if (window.location.search.indexOf('message=') >= 0) {
-            let clean_uri = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.replaceState({}, document.title, clean_uri);
-        }
-    });
-</script>
-
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
 </body>
 </html>

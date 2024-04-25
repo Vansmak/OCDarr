@@ -13,3 +13,4 @@ requests==2.31.0
 urllib3==2.2.1
 Werkzeug==3.0.1
 python-dotenv==0.19.1
+wakeonlan==2.0.1

@@ -5,11 +5,11 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      
+      SERVER_MAC: $SERVER_MAC?Variable not set}
       SONARR_URL: ${SONARR_URL?Variable not set}
       SONARR_API_KEY: ${SONARR_API_KEY?Variable not set}
       CONFIG_PATH: /app/config/config.json
-      
+
     env_file:
       - .env
 

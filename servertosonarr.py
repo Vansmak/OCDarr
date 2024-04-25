@@ -3,6 +3,7 @@ import requests
 import xml.etree.ElementTree as ET
 import logging
 import json
+import time
 from dotenv import load_dotenv
 
 # Load settings from a JSON configuration file
@@ -17,12 +18,31 @@ config = load_config()
 # Load environment variables
 load_dotenv()
 
+# Set logging path and level from environment variables
+LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
+DEBUG_MODE = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+
+# Setup logging
+log_level = logging.DEBUG if DEBUG_MODE else logging.INFO
+logging.basicConfig(
+    filename=LOG_PATH,
+    level=log_level,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+# Optionally add a console handler if in debug mode
+if DEBUG_MODE:
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logging.getLogger().addHandler(console_handler)
+
 # Define global variables based on environment settings
 
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
-
+SERVER_MAC = os.getenv('SERVER_MAC') 
 
 # Set operation-specific settings from config file
 GET_OPTION = config['get_option']
@@ -31,8 +51,6 @@ ALREADY_WATCHED = config['already_watched']
 
 ALWAYS_KEEP = config['always_keep'] 
 
-# Setup logging
-logging.basicConfig(filename=LOG_PATH, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def get_server_activity():
@@ -48,21 +66,48 @@ def get_server_activity():
         logging.error(f"Failed to read or parse data from Tautulli webhook: {str(e)}")
     return None, None, None
 
-
+def send_webhook():
+    """Send a webhook request."""
+    url = "Http://192.168.254.64:8123/api/webhook/wakeoffice"
+    try:
+        response = requests.post(url)
+        if response.status_code == 200:
+            logging.info("Webhook request sent successfully.")
+        else:
+            logging.error(f"Failed to send webhook request. Status code: {response.status_code}")
+    except Exception as e:
+        logging.error(f"Failed to send webhook request: {str(e)}")
 
 def get_series_id(series_name):
-    """Fetch series ID by name from Sonarr."""
+    """Fetch series ID by name from Sonarr using retries and WOL for unresponsive server."""
     url = f"{SONARR_URL}/api/v3/series"
     headers = {'X-Api-Key': SONARR_API_KEY}
-    response = requests.get(url, headers=headers)
-    if response.ok:
-        series_list = response.json()
-        for series in series_list:
-            if series['title'].lower() == series_name.lower():
-                return series['id']
-    else:
-        logging.error("Failed to fetch series ID.")
+    attempts = 2  # Total number of attempts to connect
+
+    for attempt in range(attempts):
+        try:
+            response = requests.get(url, headers=headers)
+            if response.ok:
+                series_list = response.json()
+                for series in series_list:
+                    if series['title'].lower() == series_name.lower():
+                        return series['id']
+            else:
+                logging.error(f"Attempt {attempt+1}: Failed to fetch series ID. Server response not OK.")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Attempt {attempt+1}: Request failed due to network error: {str(e)}")
+
+        if attempt < attempts - 1:  # If not the last attempt, try to wake the server
+            logging.info("Attempting to wake the server...")
+            send_webhook()  # Send the webhook request instead of WOL
+            logging.info("Waiting for the server to wake up... Retrying in 15 seconds.")
+            time.sleep(15)  # Pause the script for 15 seconds to allow the server time to boot
+
+    logging.error("All attempts failed after sending WOL and waiting. The server might be unreachable.")
     return None
+
+
+
 
 def get_episode_details(series_id, season_number):
     """Fetch details of episodes for a specific series and season from Sonarr."""
@@ -129,8 +174,8 @@ def find_episodes_to_delete(episode_details, current_episode_number):
     episodes_to_delete = []
     for ep in episode_details:
         if ep['episodeNumber'] < current_episode_number and ep['seriesTitle'] not in ALWAYS_KEEP:
-            if ep['episodeFileId'] > 0:  # Ensure there is a file to delete
-                episodes_to_delete.append(ep['episodeFileId'])
+            if 'episodeFileId' in ep and ep['episodeFileId'] > 0:  # Ensure there is a file to delete
+                episodes_to_delete.append(ep['episodeFileId'])  # Append the episodeFileId directly
     return episodes_to_delete
 
 def delete_episodes_in_sonarr(episode_file_ids):
@@ -164,13 +209,13 @@ def main():
             if current_season_episodes:
                 # Unmonitor all episodes watched up to the current one
                 unmonitor_ids = [ep['id'] for ep in current_season_episodes if ep['episodeNumber'] <= episode_number]
-                logging.debug(f"IDs to unmonitor: {unmonitor_ids}")  # Debugging statement
-                unmonitor_episodes(unmonitor_ids)  # Unmonitor episodes based on the IDs
+                logging.debug(f"IDs to unmonitor: {unmonitor_ids}")
+                unmonitor_episodes(unmonitor_ids)
 
                 # Handling deletions based on configuration
                 keep_ids = determine_keep_ids(current_season_episodes, episode_number, config['already_watched'], config['always_keep'])
                 episodes_to_delete = find_episodes_to_delete(current_season_episodes, episode_number)
-                episodes_to_delete = [ep for ep in episodes_to_delete if ep['id'] not in keep_ids]
+                episodes_to_delete = [ep_id for ep_id in episodes_to_delete if ep_id not in keep_ids]  # Correct handling of IDs
                 delete_episodes_in_sonarr(episodes_to_delete)
 
                 # Handling future episodes: monitor and potentially search based on ACTION_OPTION

@@ -159,7 +159,18 @@ def trigger_wake():
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Failed to send webhook: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
+@app.route('/refresh-plex', methods=['POST'])
+def refresh_plex():
+    webhook_url = "http://192.168.254.64:8123/api/webhook/update_library"
+    try:
+        response = requests.post(webhook_url)  # POST request to the webhook URL
+        if response.status_code == 200:
+            return jsonify({'status': 'success', 'message': 'Webhook triggered successfully'}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Webhook failed with status code: ' + str(response.status_code)}), 500
+    except requests.exceptions.RequestException as e:
+        app.logger.error(f"Failed to send webhook: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
     data = request.json  # Assuming data is properly formatted JSON from Tautulli

@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
+     
+      TZ: America/Los_Angeles
       SERVER_MAC: $SERVER_MAC?Variable not set}
       SONARR_URL: ${SONARR_URL?Variable not set}
       SONARR_API_KEY: ${SONARR_API_KEY?Variable not set}

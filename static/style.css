@@ -1,7 +1,7 @@
 body {
     background-image: url('https://images.unsplash.com/photo-1439792675105-701e6a4ab6f0?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
     background-size: cover;
-    background-position: top left;
+    background-position: top left 
     background-repeat: no-repeat; /* Stop repeating the background */
     background-attachment: fixed; /* This makes the background non-scrollable */
     color: #fff; /* Ensure text is white */
@@ -107,6 +107,27 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Adjust as needed */
+}
+.download-links a {
+    display: inline;
+}
+
+.button-container button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: calc(33.33% - 10px); /* Adjust width as needed */
+}
+
+.button-container button:hover {
+    background-color: #0056b3;
+}
+
 /* CSS for the modal */
 .modal {
     display: none; /* Hidden by default */

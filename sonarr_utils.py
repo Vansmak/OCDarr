@@ -11,8 +11,15 @@ load_dotenv()
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
+
+# Set logging level based on FLASK_DEBUG environment variable
+if os.getenv('FLASK_DEBUG', 'false').lower() == 'true':
+    log_level = logging.DEBUG
+else:
+    log_level = logging.INFO
+
 # Setup logging
-logging.basicConfig(filename=LOG_PATH, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename=LOG_PATH, level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def load_preferences():
     """
@@ -32,7 +39,7 @@ def fetch_episode_file_details(episode_file_id, preferences):
         response.raise_for_status()  # Raises stored HTTPError, if one occurred.
         return response.json()
     except requests.RequestException as e:
-        logging.error(f"Failed to fetch episode file details: {e}")
+        logging.debug(f"Failed to fetch episode file details: {e}") 
         return None
 
 def fetch_series_and_episodes(preferences):
@@ -68,7 +75,7 @@ def fetch_series_and_episodes(preferences):
                             'dateAdded': date_added
                         })
     except requests.RequestException as e:
-        logging.error(f"Failed to fetch series and episodes data: {e}")
+        logging.debug(f"Failed to fetch series and episodes data: {e}")
 
     active_series.sort(key=lambda series: series['dateAdded'], reverse=True)
     return active_series[:7]
@@ -97,7 +104,7 @@ def fetch_upcoming_premieres(preferences):
                     'sonarr_series_url': f"{preferences['SONARR_URL']}/series/{series['titleSlug']}"
                 })
     except requests.RequestException as e:
-        logging.error(f"Failed to fetch upcoming premieres: {e}")
+        logging.debug(f"Failed to fetch upcoming premieres: {e}")
 
     upcoming_premieres.sort(key=lambda x: x['nextAiring'])
     return upcoming_premieres
@@ -125,7 +132,7 @@ def fetch_tagged_series_names(preferences, tag_id=2):
                     'sonarr_series_url': f"{preferences['SONARR_URL']}/series/{series['titleSlug']}"
                 })
     except requests.RequestException as e:
-        logging.error(f"Failed to fetch tagged series: {e}")
+        logging.debug(f"Failed to fetch tagged series: {e}")
     except Exception as e:
         logging.error(f"An unexpected error occurred while fetching tagged series: {e}")
 

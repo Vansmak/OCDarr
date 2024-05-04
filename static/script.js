@@ -91,3 +91,18 @@ function triggerWake() {
         alert('Error sending wake command: ' + error.message);
     });
 }
+function refreshPlex() {
+    fetch('http://192.168.254.64:8123/api/webhook/update_library', {
+        method: 'POST'
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Refresh command sent successfully.');
+        } else {
+            throw new Error('Failed to send refresh command.');
+        }
+    })
+    .catch(error => {
+        alert('Error sending refresh command: ' + error.message);
+    });
+}

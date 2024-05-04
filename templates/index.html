@@ -88,25 +88,33 @@
             <button type="submit">Update Settings</button>
         </form>
     
+   
+
         <h3>View Logs</h3>
         <pre id="logContent">Click a button to load logs...</pre>
-        <button onclick="fetchLogs('app')">View App Logs</button>
-        <button onclick="fetchLogs('error')">View Error Logs</button>
-        <button onclick="hideLogs()">Close Logs</button>
-        <a href="/logs?type=app" download class="log-link">Download App Logs</a>
-        <a href="/logs?type=error" download class="log-link">Download Error Logs</a>
-    
+        <div class="button-container">
+            <button onclick="fetchLogs('app')">12 hours</button>
+            <button onclick="fetchLogs('error')">Errors</button>
+            <button onclick="hideLogs()">Close</button>
+        </div>
+        <div class="download-links">
+            <a href="/logs?type=app" download class="log-link">Download App Logs</a>,
+            <a href="/logs?type=error" download class="log-link">Download Error Logs</a>
+        </div>
+        
+
+
         <div class="form-group">
             <button onclick="location.href='http://192.168.254.85:8989/add/new';">Add new show</button>
         </div>
-        <!-- HTML button calling the JavaScript function on click -->
+        <div class="form-group">
+            <button onclick="refreshPlex();">Refresh Plex</button>
+        </div>
         <div class="form-group">
             <button onclick="triggerWake();">Wake Office PC</button>
         </div>
-    </div>
-    
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>

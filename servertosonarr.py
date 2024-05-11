@@ -42,7 +42,7 @@ if DEBUG_MODE:
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
-SERVER_MAC = os.getenv('SERVER_MAC') 
+
 
 # Set operation-specific settings from config file
 GET_OPTION = config['get_option']

@@ -205,7 +205,7 @@ def main():
         series_id = get_series_id(series_title)
         if series_id:
             logging.info(f"Series ID for '{series_title}': {series_id}")
-
+            
             episode_details = get_episode_details(series_id, season_number)
             logging.info(f"Retrieved {len(episode_details)} episode(s) for Series ID {series_id}, Season {season_number}")
 
@@ -213,29 +213,6 @@ def main():
             episode_ids_to_monitor = []
             episode_ids_to_delete = []
             keep_episode_ids = determine_keep_ids(episode_details, current_episode_number, ALREADY_WATCHED, ALWAYS_KEEP)
-
-            # Adjust logic to fetch episodes up to a full season
-            if isinstance(GET_OPTION, int):
-                remaining_episodes = [ep for ep in episode_details if ep['episodeNumber'] >= current_episode_number]
-                remaining_count = len(remaining_episodes)
-
-                if remaining_count < GET_OPTION:
-                    episode_ids_to_search.extend([ep['id'] for ep in remaining_episodes])
-
-                    next_season_number = season_number + 1
-                    while len(episode_ids_to_search) < GET_OPTION:
-                        next_season_episodes = get_episode_details(series_id, next_season_number)
-                        if not next_season_episodes:
-                            break
-
-                        needed_episodes = GET_OPTION - len(episode_ids_to_search)
-                        episode_ids_to_search.extend([ep['id'] for ep in next_season_episodes[:needed_episodes]])
-
-                        next_season_number += 1
-                else:
-                    episode_ids_to_search.extend([ep['id'] for ep in remaining_episodes[:GET_OPTION]])
-            elif GET_OPTION == 'season':
-                episode_ids_to_search.extend([ep['id'] for ep in episode_details])
 
             for episode in episode_details:
                 if episode['episodeNumber'] >= current_episode_number:

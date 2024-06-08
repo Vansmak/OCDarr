@@ -9,6 +9,7 @@
 <body>
     <div class="menu">
         <span onclick="showSection('current')" class="active">Plex</span>
+        <span onclick="showSection('prime')">Prime</span>
         <span onclick="showSection('upcoming')">Premiering</span>
         <span onclick="showSection('settings')">Settings</span>
     </div>
@@ -21,17 +22,27 @@
                     <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
                 </a>
                 <div class="episode-info">
-                    <p>
-                        {{ series.latest_monitored_episode }}
-                        {% if series.is_prime %}
-                        <img src="{{ url_for('static', filename='prime_icon.png') }}" alt="Prime" class="prime-icon">
-                        {% endif %}
-                    </p>
+                    <p>{{ series.latest_monitored_episode }}</p>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <p>No series found in current.</p>
+            <p>Unable to load series. Check Sonarr status.</p>
+        {% endif %}
+    </div>
+
+    <div id="prime" style="display: none;">
+        {% if prime_series %}
+            {% for series in prime_series %}
+            <div class="series-item">
+                <a href="{{ series.sonarr_series_url }}" target="_blank">
+                    <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="banner">
+                </a>
+                <p>{{ series.name }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No prime series available.</p>
         {% endif %}
     </div>
 
@@ -43,12 +54,7 @@
                     <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="banner">
                 </a>
                 <div class="episode-info">
-                    <p>
-                        Premieres on: {{ premiere.nextAiring }}
-                        {% if premiere.is_prime %}
-                        <img src="{{ url_for('static', filename='prime_icon.png') }}" alt="Prime" class="prime-icon">
-                        {% endif %}
-                    </p>
+                    <p>Premieres on: {{ premiere.nextAiring }}</p>
                 </div>
             </div>
             {% endfor %}
@@ -56,7 +62,7 @@
             <p>No upcoming premieres available.</p>
         {% endif %}
     </div>
-
+    
     <div id="settings" style="display: none;">
         <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
             <h3>Manage Settings</h3>
@@ -81,6 +87,8 @@
             </div>
             <button type="submit">Update Settings</button>
         </form>
+    
+   
 
         <h3>View Logs</h3>
         <pre id="logContent">Click a button to load logs...</pre>
@@ -93,6 +101,8 @@
             <a href="/logs?type=app" download class="log-link">Download App Logs</a>,
             <a href="/logs?type=error" download class="log-link">Download Error Logs</a>
         </div>
+        
+
 
         <div class="form-group">
             <button onclick="location.href='http://192.168.254.85:8989/add/new';">Add new show</button>
@@ -103,8 +113,8 @@
         <div class="form-group">
             <button onclick="triggerWake();">Wake Office PC</button>
         </div>
-    </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>

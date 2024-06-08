@@ -68,7 +68,6 @@ def fetch_series_and_episodes(preferences):
                     if episode_file_details and 'dateAdded' in episode_file_details:
                         date_added = datetime.fromisoformat(episode_file_details['dateAdded'].replace('Z', '+00:00'))
                         active_series.append({
-                            'id': series['id'],  # Include series ID
                             'name': series['title'],
                             'latest_monitored_episode': f"S{episode['seasonNumber']}E{episode['episodeNumber']} - {episode['title']}",
                             'artwork_url': f"{preferences['SONARR_URL']}/api/v3/mediacover/{series['id']}/banner.jpg?apikey={preferences['SONARR_API_KEY']}",
@@ -81,7 +80,6 @@ def fetch_series_and_episodes(preferences):
     active_series.sort(key=lambda series: series['dateAdded'], reverse=True)
     return active_series[:7]
 
-
 def fetch_upcoming_premieres(preferences):
     """
     Fetch upcoming premieres from Sonarr with timeout and detailed error handling.
@@ -92,31 +90,24 @@ def fetch_upcoming_premieres(preferences):
 
     try:
         series_response = requests.get(series_url, headers=headers, timeout=5)  # 5 seconds timeout
-        series_response.raise_for_status()
+        series_response.raise_for_status()  # Check for HTTP request errors
         series_list = series_response.json()
 
         for series in series_list:
             if 'nextAiring' in series:
                 next_airing_dt = datetime.fromisoformat(series['nextAiring'].replace('Z', '+00:00'))
-                formatted_date = next_airing_dt.strftime('%Y-%m-%d')  # Format date to only include the date
-
-                # Check if the series is tagged as Prime
-                is_prime = 2 in series.get('tags', [])
-
+                formatted_date = next_airing_dt.strftime('%Y-%m-%d at %H:%M')
                 upcoming_premieres.append({
-                    'id': series['id'],  # Include series ID
                     'name': series['title'],
                     'nextAiring': formatted_date,
                     'artwork_url': f"{preferences['SONARR_URL']}/api/v3/mediacover/{series['id']}/banner.jpg?apikey={preferences['SONARR_API_KEY']}",
-                    'sonarr_series_url': f"{preferences['SONARR_URL']}/series/{series['titleSlug']}",
-                    'is_prime': is_prime
+                    'sonarr_series_url': f"{preferences['SONARR_URL']}/series/{series['titleSlug']}"
                 })
     except requests.RequestException as e:
         logging.debug(f"Failed to fetch upcoming premieres: {e}")
 
     upcoming_premieres.sort(key=lambda x: x['nextAiring'])
     return upcoming_premieres
-
 
 
 def fetch_tagged_series_names(preferences, tag_id=2):

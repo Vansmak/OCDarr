@@ -52,15 +52,20 @@ img {
     border-bottom: 2px solid #FFF; /* Make active/hover state more prominent */
 }
 
+
+
 .banner {
     display: block;
     max-width: 100%;
     height: auto;
     opacity: 0.8;
+    filter: grayscale(100%); /* Apply a grayscale filter to make the images monochrome */
+    transition: filter 0.3s ease, opacity 0.3s ease; /* Smooth transition for filter and opacity */
 }
 
 .banner:hover {
     opacity: 1;
+    filter: grayscale(0%); /* Remove the grayscale filter on hover */
 }
 
 .sonarr-activity {
@@ -182,3 +187,19 @@ button:hover {
 .log-link:hover {
     text-decoration: underline;
 }
+.prime-indicator {
+    color: red;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.prime-icon {
+    width: 20px;
+    height: auto;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+.clearlogo {
+            width: 300px; /* Set a uniform width */
+            height: auto; /* Maintain aspect ratio */
+        }

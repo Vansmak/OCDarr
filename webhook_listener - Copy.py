@@ -63,7 +63,7 @@ def home():
     app.logger.debug("Loading the home page")
     config = load_config()
     preferences = sonarr_utils.load_preferences()
-    current_series = upcoming_premieres = None
+    current_series = upcoming_premieres = prime_series = None
 
     try:
         current_series = sonarr_utils.fetch_series_and_episodes(preferences)
@@ -77,18 +77,14 @@ def home():
         app.logger.error(f"Failed to fetch upcoming premieres: {e}")
         upcoming_premieres = None
 
-    # Fetch prime series to add indicator
     try:
-        prime_series = sonarr_utils.fetch_tagged_series_names(preferences, 2)
-        prime_series_ids = {series['id'] for series in prime_series}
-        for series in current_series:
-            series['is_prime'] = series['id'] in prime_series_ids
+        prime_series = sonarr_utils.fetch_tagged_series_names(preferences, 2)  # Ensure tag_id is an integer
     except Exception as e:
         app.logger.error(f"Failed to fetch prime series: {e}")
+        prime_series = None
 
     return render_template('index.html', config=config, current_series=current_series, 
-                           upcoming_premieres=upcoming_premieres)
-
+                           upcoming_premieres=upcoming_premieres, prime_series=prime_series)
 
 
 @app.route('/settings')

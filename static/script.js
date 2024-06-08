@@ -1,5 +1,5 @@
 function showSection(section) {
-    const sections = ['current', 'prime', 'upcoming', 'settings'];
+    const sections = ['current', 'upcoming', 'settings'];
     const tabs = document.querySelectorAll('.menu span');
 
     // Hide all sections and remove the active class from all tabs

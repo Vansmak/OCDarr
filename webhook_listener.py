@@ -151,6 +151,8 @@ def show_logs():
 
     return jsonify(logs=logs)
 
+
+
 @app.route('/trigger-wake', methods=['POST'])
 def trigger_wake():
     webhook_url = "http://192.168.254.64:8123/api/webhook/wakeoffice"
@@ -163,6 +165,7 @@ def trigger_wake():
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Failed to send webhook: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
 @app.route('/refresh-plex', methods=['POST'])
 def refresh_plex():
     webhook_url = "http://192.168.254.64:8123/api/webhook/update_library"

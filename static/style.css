@@ -1,84 +1,102 @@
 body {
     background-image: url('https://images.unsplash.com/photo-1439792675105-701e6a4ab6f0?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
     background-size: cover;
-    background-position: top left 
-    background-repeat: no-repeat; /* Stop repeating the background */
-    background-attachment: fixed; /* This makes the background non-scrollable */
-    color: #fff; /* Ensure text is white */
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #fff;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif; /* Ensure consistent font styling */
+    font-family: Arial, sans-serif;
 }
 
-.series-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 15px; /* Reduced margin */
-}
-
-img {
-    width: 100%;
-    height: auto;
-    opacity: 0.6;
-}
-
-.episode-info {
-    text-align: center;
-    margin-top: 6px; /* Reduced margin for tighter layout */
-}
-
-.episode-info h2, .episode-info p {
-    margin: 3px 0; /* Reduced margin for tighter text */
-    font-size: 14px; /* Smaller font size if needed */
+.container {
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: transparent; /* Ensure background is transparent */
 }
 
 .menu {
     display: flex;
     justify-content: center;
-    margin-bottom: 15px; /* Reduced bottom margin */
-    font-size: 14px; /* Reduced font size for tabs */
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Optional: Add a semi-transparent background to the menu for better readability */
+    padding: 10px;
+    border-radius: 10px;
 }
 
 .menu span {
     cursor: pointer;
     color: #FFF;
-    margin: 0 15px; /* Reduced spacing between tabs */
-    padding: 8px 0; /* Slightly less padding */
+    margin: 0 10px;
+    padding: 8px 0;
 }
 
 .menu span:hover, .menu span.active {
-    border-bottom: 2px solid #FFF; /* Make active/hover state more prominent */
+    border-bottom: 2px solid #FFF;
 }
 
+.series-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    background: transparent; /* Ensure background is transparent */
+}
 
+.series-item {
+    padding: 0;
+    text-align: center;
+    position: relative;
+    margin: 5px;
+    flex: 0 0 calc(33.333% - 10px);
+    background: transparent; /* Ensure background is transparent */
+}
 
-.banner {
+.poster-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.poster {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
     display: block;
-    max-width: 100%;
-    height: auto;
-    opacity: 0.8;
-    filter: grayscale(100%); /* Apply a grayscale filter to make the images monochrome */
-    transition: filter 0.3s ease, opacity 0.3s ease; /* Smooth transition for filter and opacity */
+    margin: 0 auto;
+    background: transparent; /* Ensure background is transparent */
 }
 
-.banner:hover {
-    opacity: 1;
-    filter: grayscale(0%); /* Remove the grayscale filter on hover */
+.prime-icon {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
 }
 
-.sonarr-activity {
-    padding: 8px; /* Slightly reduced padding */
-    margin-top: 15px; /* Reduced margin-top */
-    background-color: rgba(255, 255, 255, 0.1); /* Light semi-transparent background */
-    border-radius: 5px;
-    border: 1px solid #fff; /* Adds a subtle border */
+.series-info {
+    margin-top: 1px;
+    font-size: 12px;
+    line-height: 1.2;
+    background: transparent; /* Ensure background is transparent */
 }
 
-.activity-item {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+.episode-number, .episode-title {
+    font-size: 10px;
+    margin-bottom: 1px;
+    word-wrap: break-word;
+}
+
+.premiere-date {
+    font-size: 10px;
+    margin-bottom: 0;
+    margin-top: -10px; /* Adjust this value to move the date up or down */
 }
 
 .alert {
@@ -101,105 +119,5 @@ input[type="text"], select {
 }
 
 button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
     width: 100%;
 }
-
-button:hover {
-    background-color: #0056b3;
-}
-.button-container {
-    display: flex;
-    justify-content: space-between; /* Adjust as needed */
-}
-.download-links a {
-    display: inline;
-}
-
-.button-container button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    width: calc(33.33% - 10px); /* Adjust width as needed */
-}
-
-.button-container button:hover {
-    background-color: #0056b3;
-}
-
-/* CSS for the modal */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-.log-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.log-links {
-    margin-top: 10px;
-}
-
-.log-link {
-    display: block;
-    margin-top: 5px;
-    color: #007bff;
-}
-
-.log-link:hover {
-    text-decoration: underline;
-}
-.prime-indicator {
-    color: red;
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-.prime-icon {
-    width: 20px;
-    height: auto;
-    margin-left: 10px;
-    vertical-align: middle;
-}
-.clearlogo {
-            width: 300px; /* Set a uniform width */
-            height: auto; /* Maintain aspect ratio */
-        }

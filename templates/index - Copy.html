@@ -10,13 +10,10 @@
 <body>
     <div class="container">
         <div class="menu my-3">
-            <span onclick="showSection('current')" class="menu-icon active">
-                Released
-            </span>
-            <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="Settings" class="logo-icon">
-            <span onclick="showSection('upcoming')" class="menu-icon">
-                Scheduled
-            </span>
+            <img src="{{ url_for('static', filename='ocdarr.png') }}" alt="Logo" class="logo-icon">
+            <span onclick="showSection('current')" class="active">Plex</span>
+            <span onclick="showSection('upcoming')">Premiering</span>
+            <span onclick="showSection('settings')">Settings</span>
         </div>
 
         <div id="current" class="series-container">

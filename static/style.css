@@ -11,30 +11,34 @@ body {
 }
 
 .container {
-    padding-left: 10px; 
-    padding-right: 10px; 
-    background: transparent; /* Ensure background is transparent */
+    padding-left: 10px;
+    padding-right: 10px;
+    background: transparent;  /* Ensure background is transparent */
 }
 
 .menu {
     display: flex;
-    justify-content: center; /* Centers items on all screens initially */
-    align-items: center; /* Keeps items vertically centered */
-    margin-bottom: 15px;
-    font-size: 14px;
+    justify-content: space-between; /* Adjusts children to have space between them */
+    align-items: center; /* Vertically centers all items in the menu */
     width: 100%; /* Ensures the menu uses the full width */
-    background: rgba(0, 0, 0, 0.5); /* Background styling, if needed */
-    padding: 10px; /* Added some padding for better spacing */
-    border-radius: 10px; /* Keeps the border radius if you need it */
-    text-align: center; /* Center aligns text, useful if there are text elements in the menu */
+    background: rgba(0, 0, 0, 0.5); /* Background styling */
+    padding: 10px;
+    border-radius: 10px; /* Rounded corners for the menu */
+    height: 50px;
 }
 
-@media (min-width: 768px) { /* Styles for desktop screens */
-    .menu {
-        justify-content: space-around; /* More distributed but not extreme spacing */
-    }
+.menu-icon, .logo-icon {
+    cursor: pointer; /* Ensures that the spans are clickable */
+    text-decoration: none;
+    color: #FFF; /* White text color */
+    margin: 0 10px; /* Margins to ensure spacing around items */
 }
 
+.logo-icon {
+    width: 60px; /* Adjust the size as needed */
+    height: auto; /* Maintains the aspect ratio */
+    flex-shrink: 0; /* Prevents the logo from shrinking */
+}
 
 .menu span {
     cursor: pointer;
@@ -50,10 +54,10 @@ body {
 
 .logo-icon {
     width: 60px; /* Adjust the size as needed */
-    height: auto;
-    margin-top: 0px; 
-    padding: 0px;
+    height: auto; /* Maintains the aspect ratio */
+    flex-shrink: 0; /* Prevents the logo from shrinking */
 }
+
 
 .series-container {
     display: flex;
@@ -98,6 +102,15 @@ body {
     display: block;
     margin: 0 auto;
     background: transparent; /* Ensure background is transparent */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {  /* This will target screens smaller than 768px */
+    .poster {
+        width: 100px;  /* Fixed width for mobile */
+        height: 150px; /* Fixed height for mobile */
+        object-fit: contain; /* Ensure the whole image fits within the dimensions */
+    }
 }
 
 .prime-icon {

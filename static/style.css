@@ -1,95 +1,188 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Series Manager</title>
-</head>
-<body>
-    <div class="container">
-        <div class="menu my-3">
-            <span onclick="showSection('current')" class="menu-icon active">
-                Watching
-            </span>
-            <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="Settings" class="logo-icon" onclick="showSection('settings')">
-            <span onclick="showSection('upcoming')" class="menu-icon">
-                Premiering
-            </span>
-        </div>
+body {
+    background-image: url('https://images.unsplash.com/photo-1439792675105-701e6a4ab6f0?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
 
-        <div id="current" class="series-container">
-            <div class="row">
-                {% for series in current_series %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
-                    <div class="poster-wrapper">
-                        <a href="{{ series.sonarr_series_url }}">
-                            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid poster">
-                        </a>
-                    </div>
-                    <div class="series-info text-center mt-1">
-                        <p class="episode-info">{{ series.latest_monitored_episode }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+.container {
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: transparent; /* Ensure background is transparent */
+}
 
-        <div id="upcoming" class="series-container" style="display: none;">
-            <div class="row">
-                {% for premiere in upcoming_premieres %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
-                    <div class="poster-wrapper">
-                        <a href="{{ premiere.sonarr_series_url }}">
-                            <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid poster">
-                        </a>
-                    </div>
-                    <div class="series-info text-center mt-1">
-                        <p class="series-title">{{ premiere.name }}</p>
-                        <p class="episode-info">{{ premiere.nextAiring.split(' at ')[0] }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+.menu {
+    display: flex;
+    justify-content: center; /* Centers items on all screens initially */
+    align-items: center; /* Keeps items vertically centered */
+    margin-bottom: 15px;
+    font-size: 14px;
+    width: 100%; /* Ensures the menu uses the full width */
+    background: rgba(0, 0, 0, 0.5); /* Background styling, if needed */
+    padding: 10px; /* Added some padding for better spacing */
+    border-radius: 10px; /* Keeps the border radius if you need it */
+    text-align: center; /* Center aligns text, useful if there are text elements in the menu */
+}
 
-        <div id="settings" style="display: none;">
-            <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
-                <h3>Manage Settings</h3>
-                <div class="form-group">
-                    <label for="get_option">How many more episodes to get?:</label>
-                    <input type="text" id="get_option" name="get_option" placeholder="Enter 'Season' or number" class="form-control" value="{{ config.get('get_option', 'Season') }}">
-                </div>
-                <div class="form-group">
-                    <label for="action_option">Action for Episodes:</label>
-                    <select id="action_option" name="action_option" class="form-control">
-                        <option value="monitor" {{ 'selected' if config.get('action_option') == 'monitor' else '' }}>Monitor</option>
-                        <option value="search" {{ 'selected' if config.get('action_option') == 'search' else '' }}>Search</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="keep_watched">How many episodes to keep?:</label>
-                    <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'Season', 'All' or number" class="form-control" value="{{ config.get('keep_watched', 'Season') }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="monitor_watched">Keep monitored if watched:</label>
-                    <select id="monitor_watched" name="monitor_watched" class="form-control">
-                        <option value="true" {{ 'selected' if config.get('monitor_watched') == True else '' }}>true</option>
-                        <option value="false" {{ 'selected' if config.get('monitor_watched') == False else '' }}>false</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="always_keep">Shows to Always Keep (comma-separated):</label>
-                    <input type="text" id="always_keep" name="always_keep" placeholder="e.g., Show1, Show2" class="form-control" value="{{ ', '.join(config.get('always_keep', [])) }}">
-                </div>
-               
-                <button type="submit" class="btn btn-primary">Update Settings</button>
-            </form>
-        </div>
-    </div>
+@media (min-width: 768px) { /* Styles for desktop screens */
+    .menu {
+        justify-content: space-around; /* More distributed but not extreme spacing */
+    }
+}
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+
+.menu span {
+    cursor: pointer;
+    color: #FFF;
+    padding: 10px 0;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.menu span.active {
+    border-bottom: 2px solid #FFF;
+}
+
+.logo-icon {
+    width: 60px; /* Adjust the size as needed */
+    height: auto;
+    margin-top: 0px; 
+    padding: 0px;
+}
+
+.series-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    background: transparent; /* Ensure background is transparent */
+}
+
+
+@media (min-width: 768px) { /* Styles for larger screens */
+    .series-container {
+        max-width: 1200px; /* Limiting the maximum width */
+        margin: 0 auto; /* Ensures it stays centered */
+        padding-left: 120px; /* Adds some padding on the sides */
+    }
+}
+
+
+.series-item {
+    padding: 0;
+    text-align: center;
+    position: relative;
+    margin: 5px;
+    flex: 0 0 calc(33.333% - 10px);
+    background: transparent; /* Ensure background is transparent */
+}
+
+
+
+
+.poster-wrapper {
+    position: relative; /* Add relative positioning */
+    width: 100%;
+    margin: 0 auto;
+}
+
+.poster {
+    width: 100%; /*set fixed width for the poster */
+    
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    background: transparent; /* Ensure background is transparent */
+}
+
+.prime-icon {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+}
+
+.series-info {
+    margin-top: 1px;
+    font-size: 12px;
+    line-height: 1.2;
+    background: transparent; 
+}
+
+.episode-number, .episode-title {
+    font-size: 10px;
+    margin-bottom: 1px;
+    word-wrap: break-word;
+}
+
+.premiere-date {
+    font-size: 10px;
+    margin-bottom: 0;
+    margin-top: -10px; /* Adjust this value to move the date up or down */
+}
+
+.alert {
+    color: green;
+    text-align: center;
+}
+
+.form-group {
+    margin: 10px 0;
+}
+
+label {
+    display: block;
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+}
+
+button {
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}

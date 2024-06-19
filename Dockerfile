@@ -23,16 +23,15 @@ COPY requirements.txt /app/
 # Install Python dependencies listed in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the static directory first
+COPY static /app/static
+
 # Copy the rest of the application's code to the container
-COPY . /app
+COPY . /app/
 
 # Define environment variables for runtime
-ENV SERVER_URL=http://example.com \
-    SERVER_TOKEN=token_here \
-    SONARR_URL=http://sonarr.example.com \
+ENV SONARR_URL=http://sonarr.example.com \
     SONARR_API_KEY=apikey_here \
-    WATCHED_PERCENT=90 \
-    ALREADY_WATCHED=keep \
     LOG_PATH=/app/logs/app.log
 
 # Create a directory for logs
@@ -43,4 +42,3 @@ EXPOSE 5001
 
 # Use Gunicorn to serve the application
 CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5001", "webhook_listener:app"]
-

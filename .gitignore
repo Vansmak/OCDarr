@@ -5,3 +5,4 @@ preferences.json
 README.md
 .env
 logs/
+temp/

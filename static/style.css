@@ -1,140 +1,154 @@
 body {
-    background-image: url('https://images.unsplash.com/photo-1439792675105-701e6a4ab6f0?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-    background-size: cover;
-    background-position: top left;
-    background-repeat: no-repeat; /* Stop repeating the background */
-    background-attachment: fixed; /* This makes the background non-scrollable */
-    color: #fff; /* Ensure text is white */
+    background-color: #333; /* Dark grey background */
+    color: #fff;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif; /* Ensure consistent font styling */
+    font-family: Arial, sans-serif;
 }
 
-.series-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 15px; /* Reduced margin */
-}
-
-img {
-    width: 100%;
-    height: auto;
-    opacity: 0.6;
-}
-
-.episode-info {
-    text-align: center;
-    margin-top: 6px; /* Reduced margin for tighter layout */
-}
-
-.episode-info h2, .episode-info p {
-    margin: 3px 0; /* Reduced margin for tighter text */
-    font-size: 14px; /* Smaller font size if needed */
+.container {
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: transparent; 
 }
 
 .menu {
     display: flex;
-    justify-content: center;
-    margin-bottom: 15px; /* Reduced bottom margin */
-    font-size: 14px; /* Reduced font size for tabs */
+    align-items: center; /* Center align the logo and menu items */
+    justify-content: center; /* Center the menu items */
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0px;
+    border-radius: 10px;
 }
 
 .menu span {
     cursor: pointer;
     color: #FFF;
-    margin: 0 15px; /* Reduced spacing between tabs */
-    padding: 8px 0; /* Slightly less padding */
+    padding: 10px 10px; /* Adjust padding for more compact spacing */
+    margin: 0 5px; /* Reduce margin for closer spacing */
+    text-decoration: none;
 }
 
-.menu span:hover, .menu span.active {
-    border-bottom: 2px solid #FFF; /* Make active/hover state more prominent */
+.menu span.active {
+    border-bottom: 2px solid #FFF;
 }
 
-.banner {
-    display: block;
-    max-width: 100%;
+.logo-icon {
+    width: 60px; /* Adjust the size as needed */
     height: auto;
-    opacity: 0.8;
+    margin: 0 10px; /* Center align the logo */
 }
 
-.banner:hover {
-    opacity: 1;
+.series-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    background: transparent; 
 }
 
-.sonarr-activity {
-    padding: 8px; /* Slightly reduced padding */
-    margin-top: 15px; /* Reduced margin-top */
-    background-color: rgba(255, 255, 255, 0.1); /* Light semi-transparent background */
-    border-radius: 5px;
-    border: 1px solid #fff; /* Adds a subtle border */
+.series-item {
+    padding: 0;
+    text-align: center;
+    position: relative;
+    margin: 5px;
+    flex: 0 0 calc(33.333% - 10px);
+    background: transparent; 
 }
 
-.activity-item {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+.poster-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
 }
-/* General form styling */
-form {
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for form */
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px; /* Maximum width of the form */
-    margin: 20px auto; /* Centering the form */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+
+.poster {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    background: transparent; 
+}
+
+.series-info {
+    margin-top: 1px;
+    font-size: 12px;
+    line-height: 1.2;
+    background: transparent; 
+}
+
+.episode-number, .episode-title {
+    font-size: 10px;
+    margin-bottom: 1px;
+    word-wrap: break-word;
+}
+
+.premiere-date {
+    font-size: 10px;
+    margin-bottom: 0;
+    margin-top: -10px; /* Adjust this value to move the date up or down */
+}
+
+.alert {
+    color: green;
+    text-align: center;
 }
 
 .form-group {
-    margin-bottom: 20px; /* Space between form groups */
+    margin: 10px 0;
 }
 
 label {
-    display: block; /* Ensure the label uses its own line */
-    margin-bottom: 5px; /* Space below the label */
-    color: #FFF; /* White text color for readability */
+    display: block;
 }
 
 input[type="text"], select {
-    width: 100%; /* Full width */
-    padding: 8px; /* Padding for input */
-    margin-top: 5px; /* Space between label and input */
-    border-radius: 4px; /* Rounded borders */
-    border: 1px solid #FFF; /* White border */
-    background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent white */
-    color: #FFF; /* Text color */
-}
-
-input[type="text"]:focus, select:focus {
-    outline: none; /* Removes default focus outline */
-    border-color: #00A7FF; /* Highlight color when focused */
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
 }
 
 button {
-    width: 100%; /* Full width for better mobile usability */
-    padding: 10px; /* Comfortable padding */
-    background-color: #00A7FF; /* Stylish button color */
-    color: #FFF; /* Text color */
-    border: none; /* No border */
-    border-radius: 4px; /* Rounded borders */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 16px; /* Slightly larger font for button */
-    margin-top: 10px; /* Space above the button */
+    width: 100%;
 }
 
-button:hover {
-    background-color: #008ACF; /* Darker shade on hover for button */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 600px) {
-    form {
-        width: 100%; /* Full width on small screens */
-        padding: 15px; /* Slightly less padding on small screens */
-    }
+.btn-primary:hover {
+    background-color: #0056b3;
 }
 
-select {
-    color: #000; /* Or any color that suits the theme */
+.btn-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
 }

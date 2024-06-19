@@ -99,7 +99,6 @@
                 <input type="hidden" name="rule_name" id="delete_rule_name">
                 <button type="submit" class="btn btn-danger" id="delete_rule">Delete Rule</button>
             </form>
-            <button class="btn btn-secondary" onclick="showSection('assign_rules')">Assign Rules</button>
 
             <div class="form-group">
                 <h4>Missing Series Log</h4>
@@ -108,32 +107,6 @@
             <div class="form-group">
                 <a href="{{ sonarr_url }}/add/new" target="_blank">Add New Series</a>
             </div>
-        </div>
-
-        <div id="assign_rules" style="display: none;">
-            <h3>Assign Rules to Series</h3>
-            <form id="assign-rules-form" method="POST" action="{{ url_for('assign_rules') }}">
-                <div class="form-group">
-                    <label for="assign_rule_name">Select Rule:</label>
-                    <select id="assign_rule_name" name="assign_rule_name" class="form-control">
-                        {% for rule_name in config['rules'].keys() %}
-                        <option value="{{ rule_name }}">{{ rule_name|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="series_list">Select Series:</label>
-                    <div id="series_list" class="checkbox-list">
-                        {% for series in all_series %}
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="series_{{ series['id'] }}" name="series_ids" value="{{ series['id'] }}">
-                            <label for="series_{{ series['id'] }}">{{ series['title'] }} {% for rule_name, rule in config['rules'].items() %}{% if series['id'] in rule['series'] %}({{ rule_name }}){% endif %}{% endfor %}</label>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Assign Rule</button>
-            </form>
         </div>
         
         <script type="application/json" id="config-data">{{ config|tojson|safe }}</script>

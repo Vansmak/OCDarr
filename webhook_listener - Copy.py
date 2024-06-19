@@ -15,7 +15,6 @@ load_dotenv()
 
 # Load environment variables
 SONARR_URL = os.getenv('SONARR_URL')
-SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 MISSING_LOG_PATH = os.getenv('MISSING_LOG_PATH', '/app/logs/missing.log')
 
 # Setup logging to capture all logs
@@ -36,20 +35,7 @@ config_path = os.path.join(app.root_path, 'config', 'config.json')
 def load_config():
     try:
         with open(config_path, 'r') as file:
-            config = json.load(file)
-        if 'rules' not in config:
-            config['rules'] = {
-                "default": {
-                    "get_option": "sonarr",
-                    "action_option": "sonarr",
-                    "keep_watched": "sonarr",
-                    "monitor_watched": False,
-                    "series": []
-                }
-            }
-        if 'rules_mapping' not in config:
-            config['rules_mapping'] = {}
-        return config
+            return json.load(file)
     except FileNotFoundError:
         default_config = {
             'get_option': "sonarr",
@@ -61,11 +47,9 @@ def load_config():
                     "get_option": "sonarr",
                     "action_option": "sonarr",
                     "keep_watched": "sonarr",
-                    "monitor_watched": False,
-                    "series": []
+                    "monitor_watched": False
                 }
-            },
-            'rules_mapping': {}
+            }
         }
         save_config(default_config)
         return default_config
@@ -87,37 +71,14 @@ def get_missing_log_content():
         app.logger.error(f"Failed to read missing log: {str(e)}")
         return "Failed to read log."
 
-def get_all_series():
-    url = f"{SONARR_URL}/api/v3/series"
-    headers = {'X-Api-Key': SONARR_API_KEY}
-    response = requests.get(url, headers=headers)
-    return response.json() if response.ok else []
-
 @app.route('/')
 def home():
     config = load_config()
     preferences = sonarr_utils.load_preferences()
     current_series = sonarr_utils.fetch_series_and_episodes(preferences)
     upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
-    missing_log_content = get_missing_log_content()
-    all_series = get_all_series()
-    return render_template('index.html', config=config, current_series=current_series, upcoming_premieres=upcoming_premieres, all_series=all_series, sonarr_url=SONARR_URL, missing_log=missing_log_content)
-
-@app.route('/settings')
-def settings():
-    config = load_config()
-    missing_log_content = get_missing_log_content()
-    message = request.args.get('message', '')
-
-    app.logger.debug(f"Missing Log Content: {missing_log_content}")
-    show_settings = request.args.get('show_settings', 'false').lower() == 'true'
-    
-    return render_template('index.html', 
-                           config=config, 
-                           message=message, 
-                           missing_log=missing_log_content, 
-                           sonarr_url=SONARR_URL, 
-                           show_settings=show_settings)
+    missing_log_content = get_missing_log_content()  # Fetch the missing log content here
+    return render_template('index.html', config=config, current_series=current_series, upcoming_premieres=upcoming_premieres, sonarr_url=SONARR_URL, missing_log=missing_log_content)
 
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
@@ -127,7 +88,7 @@ def update_settings():
     if rule_name == 'add_new':
         rule_name = request.form.get('new_rule_name')
         if not rule_name:
-            return redirect(url_for('settings', message="New rule name is required."))
+            return redirect(url_for('home', section='settings', message="New rule name is required."))
     
     get_option = request.form.get('get_option')
     keep_watched = request.form.get('keep_watched')
@@ -136,41 +97,26 @@ def update_settings():
         'get_option': get_option,
         'action_option': request.form.get('action_option'),
         'keep_watched': keep_watched,
-        'monitor_watched': request.form.get('monitor_watched', 'false').lower() == 'true',
-        'series': config['rules'].get(rule_name, {}).get('series', [])
+        'monitor_watched': request.form.get('monitor_watched', 'false').lower() == 'true'
     }
     
     save_config(config)
-    return redirect(url_for('settings', show_settings='true', message="Settings updated successfully"))
+    return redirect(url_for('home', section='settings', message="Settings updated successfully"))
 
 @app.route('/delete_rule', methods=['POST'])
 def delete_rule():
     config = load_config()
     rule_name = request.form.get('rule_name')
-    if rule_name in config['rules']:
+    if rule_name and rule_name in config['rules']:
+        if rule_name == 'default':
+            return redirect(url_for('home', section='settings', message="Default rule cannot be deleted."))
         del config['rules'][rule_name]
         save_config(config)
-        return redirect(url_for('settings', show_settings='true', message=f"Rule '{rule_name}' deleted successfully."))
+        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' deleted successfully."))
     else:
-        return redirect(url_for('settings', show_settings='true', message=f"Rule '{rule_name}' not found."))
+        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' not found."))
 
-@app.route('/assign_rules', methods=['POST'])
-def assign_rules():
-    config = load_config()
-    rule_name = request.form.get('assign_rule_name')
-    series_ids = request.form.getlist('series_ids')
-    
-    if rule_name and series_ids:
-        for rule in config['rules'].values():
-            rule['series'] = [series_id for series_id in rule.get('series', []) if series_id not in series_ids]
 
-        if rule_name in config['rules']:
-            config['rules'][rule_name]['series'].extend(series_ids)
-            config['rules'][rule_name]['series'] = list(set(config['rules'][rule_name]['series']))
-        
-        save_config(config)
-        return redirect(url_for('settings', show_settings='true', message="Rules assigned to selected series."))
-    return redirect(url_for('settings', show_settings='true', message="Failed to assign rules to selected series."))
 
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
@@ -180,7 +126,7 @@ def handle_server_webhook():
         app.logger.info(f"Webhook received with data: {data}")
         try:
             temp_dir = '/app/temp'
-            os.makedirs(temp_dir, exist_ok=True)
+            os.makedirs(temp_dir, exist_ok=True)  # Ensure the temp directory exists
             with open(os.path.join(temp_dir, 'data_from_tautulli.json'), 'w') as f:
                 json.dump(data, f)
             app.logger.info("Data successfully written to data_from_tautulli.json")

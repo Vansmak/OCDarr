@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
         loadRule();
     });
 
+    // Ensure series list is displayed correctly when "Assign Rules" section is shown
+    document.getElementById('series_list').style.display = 'block';
+
     // Call loadRule to initialize form fields based on selected rule
     loadRule();
 });
@@ -47,6 +50,7 @@ function showSection(sectionId) {
     document.querySelector(`.menu span[onclick="showSection('${sectionId}')"]`)?.classList.add('active');
     document.querySelector(`.menu img[onclick="showSection('${sectionId}')"]`)?.classList.add('active');
 
+    // Ensure series list is displayed correctly when "Assign Rules" section is shown
     if (sectionId === 'assign_rules') {
         document.getElementById('series_list').style.display = 'block';
     }

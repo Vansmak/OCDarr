@@ -17,16 +17,6 @@ def load_preferences():
     """
     return {'SONARR_URL': SONARR_URL, 'SONARR_API_KEY': SONARR_API_KEY}
 
-def get_series_list(preferences):
-    url = f"{preferences['SONARR_URL']}/api/v3/series"
-    headers = {'X-Api-Key': preferences['SONARR_API_KEY']}
-    response = requests.get(url, headers=headers)
-    if response.ok:
-        return response.json()
-    else:
-        return []
-
-
 def fetch_episode_file_details(episode_file_id):
     episode_file_url = f"{SONARR_URL}/api/v3/episodefile/{episode_file_id}"
     headers = {'X-Api-Key': SONARR_API_KEY}
@@ -94,5 +84,3 @@ def fetch_upcoming_premieres(preferences):
 
     upcoming_premieres.sort(key=lambda x: x['nextAiring'])
     return upcoming_premieres
-
-

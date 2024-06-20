@@ -12,10 +12,11 @@ def load_config():
     if 'rules' not in config:
         config['rules'] = {
             "default": {
-                "get_option": "sonarr",
-                "action_option": "sonarr",
-                "keep_watched": "sonarr",
-                "monitor_watched": False
+                "get_option": "1",
+                "action_option": "monitor",
+                "keep_watched": "all",
+                "monitor_watched": True,
+                "series": []
             }
         }
     return config
@@ -196,6 +197,7 @@ def fetch_next_episodes(series_id, season_number, episode_number, get_option):
         else:
             raise ValueError(f"Invalid get_option value: {get_option}")
 
+
 def fetch_all_episodes(series_id):
     """Fetch all episodes for a series from Sonarr."""
     all_episodes = []
@@ -228,9 +230,11 @@ def main():
     series_name, season_number, episode_number = get_server_activity()
     if series_name:
         series_id = get_series_id(series_name)
+        logger.info(f"Fetched series ID: {series_id} for series: {series_name}")
         if series_id:
             # Determine which rule to apply
-            rule = config['rules'].get(series_name, config['rules']['default'])
+            rule_name = next((rule_name for rule_name, rule_data in config['rules'].items() if str(series_id) in rule_data.get('series', [])), 'default')
+            rule = config['rules'].get(rule_name, config['rules']['default'])
 
             get_option = rule['get_option']
             action_option = rule['action_option']

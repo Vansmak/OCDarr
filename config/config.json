@@ -6,19 +6,9 @@
     "rules": {
         "default": {
             "get_option": "1",
-            "action_option": "search",
-            "keep_watched": "1",
-            "monitor_watched": false,
-            "series": [
-                "8",
-                "1"
-            ]
-        },
-        "keep1search1": {
-            "get_option": "1",
-            "action_option": "search",
-            "keep_watched": "1",
-            "monitor_watched": false,
+            "action_option": "monitor",
+            "keep_watched": "all",
+            "monitor_watched": true,
             "series": []
         },
         "full_seasons": {
@@ -41,6 +31,15 @@
             "keep_watched": "all",
             "monitor_watched": false,
             "series": []
+        },
+        "search1keep1": {
+            "get_option": "1",
+            "action_option": "search",
+            "keep_watched": "1",
+            "monitor_watched": false,
+            "series": [
+                "51"
+            ]
         }
     },
     "rules_mapping": {}

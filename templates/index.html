@@ -61,7 +61,7 @@
                     <label for="rule_name">Select Rule:</label>
                     <select id="rule_name" name="rule_name" class="form-control">
                         {% for rule_name in config['rules'].keys() %}
-                        <option value="{{ rule_name }}" {{ 'selected' if rule_name == 'default' else '' }}>{{ rule_name|capitalize }}</option>
+                        <option value="{{ rule_name }}" {{ 'selected' if rule_name == rule else '' }}>{{ rule_name|capitalize }}</option>
                         {% endfor %}
                         <option value="add_new">Add New</option>
                     </select>
@@ -72,34 +72,38 @@
                 </div>
                 <div class="form-group">
                     <label for="get_option">How many more episodes to get?:</label>
-                    <input type="text" id="get_option" name="get_option" placeholder="Enter 'season', 'all', 'sonarr' or a number" class="form-control" value="">
+                    <input type="text" id="get_option" name="get_option" placeholder="Enter 'season', 'all',  or a number" class="form-control" value="">
                 </div>
                 <div class="form-group">
                     <label for="action_option">Action for Episodes:</label>
                     <select id="action_option" name="action_option" class="form-control">
                         <option value="monitor">Monitor</option>
                         <option value="search">Search</option>
+                        
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="keep_watched">How many episodes to keep?:</label>
-                    <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'season', 'all', 'sonarr' or a number" class="form-control" value="">
+                    <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'season', 'all',  or a number" class="form-control" value="">
                 </div>
                 <div class="form-group">
                     <label for="monitor_watched">Keep monitored if watched:</label>
                     <select id="monitor_watched" name="monitor_watched" class="form-control">
                         <option value="true">true</option>
                         <option value="false">false</option>
+                        
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Update Settings</button>
+                
             </form>
             
-            <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}">
+            <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}" onsubmit="return confirmDeleteRule()">
                 <input type="hidden" name="rule_name" id="delete_rule_name">
                 <button type="submit" class="btn btn-danger" id="delete_rule">Delete Rule</button>
             </form>
-            <button class="btn btn-secondary" onclick="showSection('assign_rules')">Assign Rules</button>
+            
+            <button class="btn btn-secondary" id="assign-rules-button" onclick="showSection('assign_rules', document.getElementById('rule_name').value)">Assign Rules</button>
 
             <div class="form-group">
                 <h4>Missing Series Log</h4>
@@ -109,15 +113,15 @@
                 <a href="{{ sonarr_url }}/add/new" target="_blank">Add New Series</a>
             </div>
         </div>
-
+        
         <div id="assign_rules" style="display: none;">
             <h3>Assign Rules to Series</h3>
             <form id="assign-rules-form" method="POST" action="{{ url_for('assign_rules') }}">
                 <div class="form-group">
                     <label for="assign_rule_name">Select Rule:</label>
-                    <select id="assign_rule_name" name="assign_rule_name" class="form-control">
+                    <select id="assign_rule_name" name="assign_rule_name" class="form-control" onchange="updateCheckboxes()">
                         {% for rule_name in config['rules'].keys() %}
-                        <option value="{{ rule_name }}">{{ rule_name|capitalize }}</option>
+                        <option value="{{ rule_name }}" {{ 'selected' if rule_name == rule else '' }}>{{ rule_name|capitalize }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -126,8 +130,8 @@
                     <div id="series_list" class="checkbox-list">
                         {% for series in all_series %}
                         <div class="checkbox-item">
-                            <input type="checkbox" id="series_{{ series['id'] }}" name="series_ids" value="{{ series['id'] }}">
-                            <label for="series_{{ series['id'] }}">{{ series['title'] }} {% for rule_name, rule in config['rules'].items() %}{% if series['id'] in rule['series'] %}({{ rule_name }}){% endif %}{% endfor %}</label>
+                            <input type="checkbox" class="series-checkbox" id="series_{{ series['id'] }}" name="series_ids" value="{{ series['id'] }}" data-rule="{{ series['assigned_rule'] }}">
+                            <label for="series_{{ series['id'] }}">{{ series['title'] }} ({{ series['assigned_rule'] or 'None' }})</label>
                         </div>
                         {% endfor %}
                     </div>

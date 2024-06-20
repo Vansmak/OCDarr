@@ -1,12 +1,11 @@
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import subprocess
 import os
-import requests
 import logging
 import json
-import subprocess
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+import sonarr_utils
 from datetime import datetime
 from dotenv import load_dotenv
-import sonarr_utils
 
 app = Flask(__name__)
 
@@ -40,10 +39,10 @@ def load_config():
         if 'rules' not in config:
             config['rules'] = {
                 "default": {
-                    "get_option": "sonarr",
-                    "action_option": "sonarr",
-                    "keep_watched": "sonarr",
-                    "monitor_watched": False,
+                    "get_option": "1",
+                    "action_option": "monitor",
+                    "keep_watched": "all",
+                    "monitor_watched": True,
                     "series": []
                 }
             }
@@ -52,16 +51,16 @@ def load_config():
         return config
     except FileNotFoundError:
         default_config = {
-            'get_option': "sonarr",
-            'action_option': "sonarr",
-            'keep_watched': "sonarr",
-            'monitor_watched': False,
+            'get_option': "1",
+            'action_option': "monitor",
+            'keep_watched': "all",
+            'monitor_watched': True,
             'rules': {
                 "default": {
-                    "get_option": "sonarr",
-                    "action_option": "sonarr",
-                    "keep_watched": "sonarr",
-                    "monitor_watched": False,
+                    "get_option": "1",
+                    "action_option": "monitor",
+                    "keep_watched": "all",
+                    "monitor_watched": True,
                     "series": []
                 }
             },
@@ -87,37 +86,28 @@ def get_missing_log_content():
         app.logger.error(f"Failed to read missing log: {str(e)}")
         return "Failed to read log."
 
-def get_all_series():
-    url = f"{SONARR_URL}/api/v3/series"
-    headers = {'X-Api-Key': SONARR_API_KEY}
-    response = requests.get(url, headers=headers)
-    return response.json() if response.ok else []
-
 @app.route('/')
 def home():
     config = load_config()
     preferences = sonarr_utils.load_preferences()
     current_series = sonarr_utils.fetch_series_and_episodes(preferences)
     upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
-    missing_log_content = get_missing_log_content()
-    all_series = get_all_series()
-    return render_template('index.html', config=config, current_series=current_series, upcoming_premieres=upcoming_premieres, all_series=all_series, sonarr_url=SONARR_URL, missing_log=missing_log_content)
-
-@app.route('/settings')
-def settings():
-    config = load_config()
-    missing_log_content = get_missing_log_content()
-    message = request.args.get('message', '')
-
-    app.logger.debug(f"Missing Log Content: {missing_log_content}")
-    show_settings = request.args.get('show_settings', 'false').lower() == 'true'
+    all_series = sonarr_utils.get_series_list(preferences)  # Ensure this function fetches series info
     
-    return render_template('index.html', 
-                           config=config, 
-                           message=message, 
-                           missing_log=missing_log_content, 
-                           sonarr_url=SONARR_URL, 
-                           show_settings=show_settings)
+    # Build a dictionary that maps series IDs to their assigned rules
+    rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() for series_id in details.get('series', [])}
+
+    # Annotate each series with its assigned rule or 'None'
+    for series in all_series:
+        series['assigned_rule'] = rules_mapping.get(str(series['id']), 'None')
+
+    missing_log_content = get_missing_log_content()  # Fetch the missing log content here
+
+    rule = request.args.get('rule', 'default')  # Get the rule parameter from the request
+
+    return render_template('index.html', config=config, current_series=current_series, 
+                           upcoming_premieres=upcoming_premieres, all_series=all_series, 
+                           sonarr_url=SONARR_URL, missing_log=missing_log_content, rule=rule)
 
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
@@ -127,7 +117,7 @@ def update_settings():
     if rule_name == 'add_new':
         rule_name = request.form.get('new_rule_name')
         if not rule_name:
-            return redirect(url_for('settings', message="New rule name is required."))
+            return redirect(url_for('home', section='settings', message="New rule name is required."))
     
     get_option = request.form.get('get_option')
     keep_watched = request.form.get('keep_watched')
@@ -141,36 +131,38 @@ def update_settings():
     }
     
     save_config(config)
-    return redirect(url_for('settings', show_settings='true', message="Settings updated successfully"))
+    return redirect(url_for('home', section='settings', message="Settings updated successfully"))
 
 @app.route('/delete_rule', methods=['POST'])
 def delete_rule():
     config = load_config()
     rule_name = request.form.get('rule_name')
-    if rule_name in config['rules']:
+    if rule_name and rule_name in config['rules']:
         del config['rules'][rule_name]
         save_config(config)
-        return redirect(url_for('settings', show_settings='true', message=f"Rule '{rule_name}' deleted successfully."))
+        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' deleted successfully."))
     else:
-        return redirect(url_for('settings', show_settings='true', message=f"Rule '{rule_name}' not found."))
+        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' not found."))
 
 @app.route('/assign_rules', methods=['POST'])
 def assign_rules():
     config = load_config()
     rule_name = request.form.get('assign_rule_name')
-    series_ids = request.form.getlist('series_ids')
-    
-    if rule_name and series_ids:
-        for rule in config['rules'].values():
-            rule['series'] = [series_id for series_id in rule.get('series', []) if series_id not in series_ids]
+    submitted_series_ids = set(request.form.getlist('series_ids'))
 
-        if rule_name in config['rules']:
-            config['rules'][rule_name]['series'].extend(series_ids)
-            config['rules'][rule_name]['series'] = list(set(config['rules'][rule_name]['series']))
-        
-        save_config(config)
-        return redirect(url_for('settings', show_settings='true', message="Rules assigned to selected series."))
-    return redirect(url_for('settings', show_settings='true', message="Failed to assign rules to selected series."))
+    # Update the rule's series list to include only those submitted
+    if rule_name in config['rules']:
+        config['rules'][rule_name]['series'] = [sid for sid in submitted_series_ids]
+
+    # Update other rules to remove the series if it's no longer assigned there
+    for key, details in config['rules'].items():
+        if key != rule_name:
+            details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
+
+    save_config(config)
+    return redirect(url_for('home', section='settings', message="Rules updated successfully."))
+
+
 
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
@@ -193,6 +185,7 @@ def handle_server_webhook():
         return jsonify({'status': 'success', 'message': 'Script triggered successfully'}), 200
     else:
         return jsonify({'status': 'error', 'message': 'No data received'}), 400
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')

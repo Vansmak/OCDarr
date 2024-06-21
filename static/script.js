@@ -69,10 +69,110 @@ function loadRule() {
 
 function updateCheckboxes() {
     var selectedRule = document.getElementById('assign_rule_name').value;
-    var checkboxes = document.querySelectorAll('.series-checkbox');
+    
+    var checkboxes = Array.from(document.querySelectorAll('.series-checkbox'));
+    
+    var seriesContainer = document.getElementById('series_list');
+    
+    // Clear the series container
+    seriesContainer.innerHTML = '';
+
+    // Group series by rules
+    var groupedSeries = {};
     checkboxes.forEach(function(checkbox) {
-        checkbox.checked = checkbox.getAttribute('data-rule') === selectedRule;
+        var rule = checkbox.getAttribute('data-rule') || 'None';
+        if (!groupedSeries[rule]) {
+            groupedSeries[rule] = [];
+        }
+        groupedSeries[rule].push(checkbox);
     });
+
+    // Sort each group alphabetically
+    for (var rule in groupedSeries) {
+        groupedSeries[rule].sort((a, b) => {
+            var titleA = a.nextElementSibling ? a.nextElementSibling.textContent.toLowerCase() : '';
+            var titleB = b.nextElementSibling ? b.nextElementSibling.textContent.toLowerCase() : '';
+            return titleA.localeCompare(titleB);
+        });
+    }
+
+    // Create and append checkboxes grouped by rules
+    var rules = Object.keys(groupedSeries);
+
+    // Prioritize the selected rule
+    if (rules.includes(selectedRule)) {
+        rules.splice(rules.indexOf(selectedRule), 1); // Remove selected rule from its current position
+        rules.unshift(selectedRule); // Add selected rule to the top
+    }
+
+    // Move the 'None' group to the end
+    if (rules.includes('None')) {
+        rules.splice(rules.indexOf('None'), 1); // Remove 'None' from its current position
+        rules.push('None'); // Add 'None' to the end
+    }
+
+    // Fetch the config data
+    var config = JSON.parse(document.getElementById('config-data').textContent);
+
+    rules.forEach(function(rule) {
+        var ruleHeader = document.createElement('h5');
+        ruleHeader.classList.add('rule-header');
+
+        // Create a span to hold the rule details
+        var ruleDetails = '';
+        if (config.rules[rule]) {
+            ruleDetails = ` (Get: ${config.rules[rule].get_option}, Action: ${config.rules[rule].action_option}, Keep: ${config.rules[rule].keep_watched}, Monitor Watched: ${config.rules[rule].monitor_watched})`;
+        }
+
+        ruleHeader.textContent = rule + ruleDetails;
+
+        // Add Check/Uncheck All checkbox
+        var checkUncheckAllLabel = document.createElement('label');
+        checkUncheckAllLabel.textContent = ' Check/Uncheck All ';
+        
+        var checkUncheckAll = document.createElement('input');
+        checkUncheckAll.type = 'checkbox';
+        checkUncheckAll.classList.add('check-uncheck-all');
+        checkUncheckAll.setAttribute('data-rule', rule);
+        checkUncheckAll.addEventListener('change', function() {
+            var checkboxes = groupedSeries[rule];
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = checkUncheckAll.checked;
+            });
+        });
+
+        var disclaimer = document.createElement('span');
+        disclaimer.classList.add('disclaimer');
+        disclaimer.textContent = ' (assigning will override current assignments)';
+
+        checkUncheckAllLabel.appendChild(checkUncheckAll);
+        ruleHeader.appendChild(checkUncheckAllLabel);
+        ruleHeader.appendChild(disclaimer);
+        seriesContainer.appendChild(ruleHeader);
+
+        var rowDiv = document.createElement('div');
+        rowDiv.classList.add('row');
+
+        groupedSeries[rule].forEach(function(checkbox) {
+            var colDiv = document.createElement('div');
+            colDiv.classList.add('col-md-4', 'checkbox-item');
+
+            // Ensure we correctly get the label element
+            var label = checkbox.nextElementSibling;
+            if (label && label.tagName === 'LABEL') {
+                colDiv.appendChild(checkbox);
+                colDiv.appendChild(label);
+            }
+
+            rowDiv.appendChild(colDiv);
+        });
+
+        seriesContainer.appendChild(rowDiv);
+    });
+
+    // Ensure the selected rule is carried over to the unassign form
+    var unassignForm = document.getElementById('unassign-rules-form');
+    unassignForm.querySelector('input[name="assign_rule_name"]').value = selectedRule;
 }
 
 function confirmDeleteRule() {

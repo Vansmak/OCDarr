@@ -6,6 +6,20 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Series Manager</title>
+    <script>
+        function toggleNewRuleName() {
+            var ruleNameSelect = document.getElementById("rule_name");
+            var newRuleNameGroup = document.getElementById("new_rule_name_group");
+            if (ruleNameSelect.value === "add_new") {
+                newRuleNameGroup.style.display = "block";
+            } else {
+                newRuleNameGroup.style.display = "none";
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleNewRuleName();  // Ensure it runs on page load in case 'Add New' is already selected
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -59,7 +73,7 @@
                 <h3>Manage Settings</h3>
                 <div class="form-group">
                     <label for="rule_name">Select Rule:</label>
-                    <select id="rule_name" name="rule_name" class="form-control">
+                    <select id="rule_name" name="rule_name" class="form-control" onchange="toggleNewRuleName()">
                         {% for rule_name in config['rules'].keys() %}
                         <option value="{{ rule_name }}" {{ 'selected' if rule_name == rule else '' }}>{{ rule_name|capitalize }}</option>
                         {% endfor %}
@@ -72,30 +86,27 @@
                 </div>
                 <div class="form-group">
                     <label for="get_option">How many more episodes to get?:</label>
-                    <input type="text" id="get_option" name="get_option" placeholder="Enter 'season', 'all',  or a number" class="form-control" value="">
+                    <input type="text" id="get_option" name="get_option" placeholder="Enter 'season', 'all', or a number" class="form-control" value="">
                 </div>
                 <div class="form-group">
                     <label for="action_option">Action for Episodes:</label>
                     <select id="action_option" name="action_option" class="form-control">
                         <option value="monitor">Monitor</option>
                         <option value="search">Search</option>
-                        
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="keep_watched">How many episodes to keep?:</label>
-                    <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'season', 'all',  or a number" class="form-control" value="">
+                    <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'season', 'all', or a number" class="form-control" value="">
                 </div>
                 <div class="form-group">
                     <label for="monitor_watched">Keep monitored if watched:</label>
                     <select id="monitor_watched" name="monitor_watched" class="form-control">
                         <option value="true">true</option>
                         <option value="false">false</option>
-                        
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Update Settings</button>
-                
             </form>
             
             <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}" onsubmit="return confirmDeleteRule()">
@@ -115,11 +126,12 @@
         </div>
         
         <div id="assign_rules" style="display: none;">
-            <h3>Assign Rules to Series</h3>
+            <h3>Assign/Unassign Rules to Series</h3>
             <form id="assign-rules-form" method="POST" action="{{ url_for('assign_rules') }}">
                 <div class="form-group">
                     <label for="assign_rule_name">Select Rule:</label>
                     <select id="assign_rule_name" name="assign_rule_name" class="form-control" onchange="updateCheckboxes()">
+                        <option value="None">None</option>
                         {% for rule_name in config['rules'].keys() %}
                         <option value="{{ rule_name }}" {{ 'selected' if rule_name == rule else '' }}>{{ rule_name|capitalize }}</option>
                         {% endfor %}
@@ -136,9 +148,16 @@
                         {% endfor %}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Assign Rule</button>
+                <button type="submit" class="btn btn-primary">Assign checked shows to above rule</button>
+                <span class="disclaimer">(will override current assignments)</span>
+            </form>
+        
+            <form id="unassign-rules-form" method="POST" action="{{ url_for('unassign_rules') }}">
+                <input type="hidden" name="assign_rule_name" value="{{ rule_name }}">
+                <button type="submit" class="btn btn-secondary">Unassign checked shows from above rule</button>
             </form>
         </div>
+        
         
         <script type="application/json" id="config-data">{{ config|tojson|safe }}</script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>

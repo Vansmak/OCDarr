@@ -1,36 +1,14 @@
 {
-    "get_option": "season",
-    "action_option": "monitor",
-    "keep_watched": "2",
-    "monitor_watched": false,
     "rules": {
-        "default": {
-            "get_option": "1",
-            "action_option": "monitor",
-            "keep_watched": "all",
-            "monitor_watched": true,
-            "series": []
-        },
         "full_seasons": {
             "get_option": "season",
             "action_option": "monitor",
             "keep_watched": "season",
             "monitor_watched": false,
-            "series": []
-        },
-        "mon_season_keep1": {
-            "get_option": "season",
-            "action_option": "monitor",
-            "keep_watched": "1",
-            "monitor_watched": false,
-            "series": []
-        },
-        "search1keepall": {
-            "get_option": "1",
-            "action_option": "search",
-            "keep_watched": "all",
-            "monitor_watched": false,
-            "series": []
+            "series": [
+                "66",
+                "27"
+            ]
         },
         "search1keep1": {
             "get_option": "1",
@@ -38,7 +16,8 @@
             "keep_watched": "1",
             "monitor_watched": false,
             "series": [
-                "51"
+                "25",
+                "20"
             ]
         }
     },

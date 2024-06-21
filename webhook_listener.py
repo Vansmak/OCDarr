@@ -37,34 +37,19 @@ def load_config():
         with open(config_path, 'r') as file:
             config = json.load(file)
         if 'rules' not in config:
-            config['rules'] = {
-                "default": {
-                    "get_option": "1",
-                    "action_option": "monitor",
-                    "keep_watched": "all",
-                    "monitor_watched": True,
-                    "series": []
-                }
-            }
-        if 'rules_mapping' not in config:
-            config['rules_mapping'] = {}
+            config['rules'] = {}
         return config
     except FileNotFoundError:
         default_config = {
-            'get_option': "1",
-            'action_option': "monitor",
-            'keep_watched': "all",
-            'monitor_watched': True,
             'rules': {
-                "default": {
-                    "get_option": "1",
-                    "action_option": "monitor",
-                    "keep_watched": "all",
-                    "monitor_watched": True,
-                    "series": []
+                'full_seasons': {
+                    'get_option': 'season',
+                    'action_option': 'monitor',
+                    'keep_watched': 'season',
+                    'monitor_watched': False,
+                    'series': ['series_id1', 'series_id2']
                 }
-            },
-            'rules_mapping': {}
+            }
         }
         save_config(default_config)
         return default_config
@@ -103,7 +88,7 @@ def home():
 
     missing_log_content = get_missing_log_content()  # Fetch the missing log content here
 
-    rule = request.args.get('rule', 'default')  # Get the rule parameter from the request
+    rule = request.args.get('rule', 'full_seasons')  # Get the rule parameter from the request
 
     return render_template('index.html', config=config, current_series=current_series, 
                            upcoming_premieres=upcoming_premieres, all_series=all_series, 
@@ -150,19 +135,41 @@ def assign_rules():
     rule_name = request.form.get('assign_rule_name')
     submitted_series_ids = set(request.form.getlist('series_ids'))
 
-    # Update the rule's series list to include only those submitted
-    if rule_name in config['rules']:
-        config['rules'][rule_name]['series'] = [sid for sid in submitted_series_ids]
-
-    # Update other rules to remove the series if it's no longer assigned there
-    for key, details in config['rules'].items():
-        if key != rule_name:
+    if rule_name == 'None':
+        # Remove series from any rule
+        for key, details in config['rules'].items():
             details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
+    else:
+        # Update the rule's series list to include only those submitted
+        if rule_name in config['rules']:
+            current_series = set(config['rules'][rule_name]['series'])
+            updated_series = current_series.union(submitted_series_ids)
+            config['rules'][rule_name]['series'] = list(updated_series)
+
+        # Update other rules to remove the series if it's no longer assigned there
+        for key, details in config['rules'].items():
+            if key != rule_name:
+                # Preserve series not submitted in other rules
+                details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
 
     save_config(config)
     return redirect(url_for('home', section='settings', message="Rules updated successfully."))
 
 
+@app.route('/unassign_rules', methods=['POST'])
+def unassign_rules():
+    config = load_config()
+    rule_name = request.form.get('assign_rule_name')
+    submitted_series_ids = set(request.form.getlist('series_ids'))
+
+    # Update the rule's series list to exclude those submitted
+    if rule_name in config['rules']:
+        current_series = set(config['rules'][rule_name]['series'])
+        updated_series = current_series.difference(submitted_series_ids)
+        config['rules'][rule_name]['series'] = list(updated_series)
+
+    save_config(config)
+    return redirect(url_for('home', section='settings', message="Rules updated successfully."))
 
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
@@ -185,7 +192,6 @@ def handle_server_webhook():
         return jsonify({'status': 'success', 'message': 'Script triggered successfully'}), 200
     else:
         return jsonify({'status': 'error', 'message': 'No data received'}), 400
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')

@@ -10,15 +10,7 @@ def load_config():
     with open(config_path, 'r') as file:
         config = json.load(file)
     if 'rules' not in config:
-        config['rules'] = {
-            "default": {
-                "get_option": "1",
-                "action_option": "monitor",
-                "keep_watched": "all",
-                "monitor_watched": True,
-                "series": []
-            }
-        }
+        config['rules'] = {}
     return config
 
 config = load_config()
@@ -76,20 +68,16 @@ def get_episode_details(series_id, season_number):
     headers = {'X-Api-Key': SONARR_API_KEY}
     response = requests.get(url, headers=headers)
     if response.ok:
-        episode_details = response.json()
-        return episode_details
+        return response.json()
     logger.error("Failed to fetch episode details.")
     return []
 
-def get_series_title(series_id):
-    """Fetch series title by series ID from Sonarr."""
-    url = f"{SONARR_URL}/api/v3/series/{series_id}"
-    headers = {'X-Api-Key': SONARR_API_KEY}
-    response = requests.get(url, headers=headers)
-    if response.ok:
-        return response.json()['title']
-    logger.error("Failed to fetch series title.")
-    return None
+def monitor_or_search_episodes(episode_ids, action_option):
+    """Either monitor or trigger a search for episodes in Sonarr based on the action_option."""
+    if action_option == "monitor":
+        monitor_episodes(episode_ids, True)
+    elif action_option == "search":
+        trigger_episode_search_in_sonarr(episode_ids)
 
 def monitor_episodes(episode_ids, monitor=True):
     """Set episodes to monitored or unmonitored in Sonarr."""
@@ -98,9 +86,10 @@ def monitor_episodes(episode_ids, monitor=True):
     data = {"episodeIds": episode_ids, "monitored": monitor}
     response = requests.put(url, json=data, headers=headers)
     if response.ok:
-        logger.info(f"Episodes {episode_ids} set to monitored: {monitor}")
+        action = "monitored" if monitor else "unmonitored"
+        logger.info(f"Episodes {episode_ids} successfully {action}.")
     else:
-        logger.error(f"Failed to set episodes to monitored. Response: {response.text}")
+        logger.error(f"Failed to set episodes {action}. Response: {response.text}")
 
 def trigger_episode_search_in_sonarr(episode_ids):
     """Trigger a search for specified episodes in Sonarr."""
@@ -115,31 +104,25 @@ def trigger_episode_search_in_sonarr(episode_ids):
 
 def unmonitor_episodes(episode_ids):
     """Unmonitor specified episodes in Sonarr."""
-    unmonitor_url = f"{SONARR_URL}/api/v3/episode/monitor"
-    unmonitor_data = {"episodeIds": episode_ids, "monitored": False}
-    unmonitor_headers = {'X-Api-Key': SONARR_API_KEY, 'Content-Type': 'application/json'}
-    response = requests.put(unmonitor_url, json=unmonitor_data, headers=unmonitor_headers)
-    if response.ok:
-        logger.info(f"Episodes {episode_ids} unmonitored successfully.")
-    else:
-        logger.error(f"Failed to unmonitor episodes. Response: {response.text}")
+    monitor_episodes(episode_ids, False)
 
 def find_episodes_to_delete(all_episodes, keep_watched, last_watched_id):
     """Find episodes to delete, ensuring they're not in the keep list and have files."""
     episodes_to_delete = []
     if keep_watched == "all":
-        return episodes_to_delete
+        return episodes_to_delete  # Skip deletion logic entirely if "all" is specified.
     elif keep_watched == "season":
-        last_watched_season = max(ep['seasonNumber'] for ep in all_episodes if ep['id'] == last_watched_id)
-        episodes_to_delete = [ep['episodeFileId'] for ep in all_episodes if ep['seasonNumber'] < last_watched_season and ep['episodeFileId'] > 0]
+        last_watched_season = next(ep['seasonNumber'] for ep in all_episodes if ep['id'] == last_watched_id)
+        episodes_to_delete = [ep for ep in all_episodes if ep['seasonNumber'] < last_watched_season and ep['hasFile']]
     elif isinstance(keep_watched, int):
-        sorted_episodes = sorted(all_episodes, key=lambda ep: (ep['seasonNumber'], ep['episodeNumber']))
-        last_watched_index = next(i for i, ep in enumerate(sorted_episodes) if ep['id'] == last_watched_id)
+        # Sort episodes by date, keeping only the specified count, including and prior to the last watched.
+        sorted_episodes = sorted(all_episodes, key=lambda ep: (ep['seasonNumber'], ep['episodeNumber']), reverse=True)
+        last_watched_index = next((i for i, ep in enumerate(sorted_episodes) if ep['id'] == last_watched_id), None)
         keep_range = sorted_episodes[max(0, last_watched_index - keep_watched + 1):last_watched_index + 1]
         keep_ids = {ep['id'] for ep in keep_range}
-        episodes_to_delete = [ep['episodeFileId'] for ep in all_episodes if ep['id'] not in keep_ids and ep['episodeFileId'] > 0]
+        episodes_to_delete = [ep for ep in all_episodes if ep['id'] not in keep_ids and ep['hasFile']]
 
-    return episodes_to_delete
+    return [ep['episodeFileId'] for ep in episodes_to_delete if 'episodeFileId' in ep]
 
 def delete_episodes_in_sonarr(episode_file_ids):
     """Delete specified episodes in Sonarr."""
@@ -161,7 +144,7 @@ def delete_episodes_in_sonarr(episode_file_ids):
         except Exception as err:
             logger.error(f"Other error occurred: {err}")
             failed_deletes.append(episode_file_id)
-    
+
     if failed_deletes:
         logger.error(f"Failed to delete the following episode files: {failed_deletes}")
 
@@ -172,8 +155,8 @@ def fetch_next_episodes(series_id, season_number, episode_number, get_option):
     try:
         if get_option == "all":
             # Fetch all episodes from Sonarr
-            current_season_episodes = get_episode_details(series_id, season_number)
-            next_episode_ids.extend([ep['id'] for ep in current_season_episodes])
+            all_episodes = fetch_all_episodes(series_id)
+            next_episode_ids.extend([ep['id'] for ep in all_episodes if ep['seasonNumber'] >= season_number])
             return next_episode_ids
         num_episodes = int(get_option)
         # Get remaining episodes in the current season
@@ -197,26 +180,25 @@ def fetch_next_episodes(series_id, season_number, episode_number, get_option):
         else:
             raise ValueError(f"Invalid get_option value: {get_option}")
 
-
 def fetch_all_episodes(series_id):
     """Fetch all episodes for a series from Sonarr."""
-    all_episodes = []
     url = f"{SONARR_URL}/api/v3/episode?seriesId={series_id}"
     headers = {'X-Api-Key': SONARR_API_KEY}
     response = requests.get(url, headers=headers)
     if response.ok:
-        all_episodes = response.json()
-    return all_episodes
+        return response.json()
+    logger.error("Failed to fetch all episodes.")
+    return []
 
 def delete_old_episodes(series_id, keep_episode_ids):
     """Delete old episodes that are not in the keep list."""
     all_episodes = fetch_all_episodes(series_id)
     episodes_with_files = [ep for ep in all_episodes if ep['hasFile']]
-    
+
     if config['keep_watched'] == "all":
         logger.info("No episodes to delete as keep_watched is set to 'all'.")
         return
-    
+
     if config['keep_watched'] == "season":
         last_watched_season = max(ep['seasonNumber'] for ep in all_episodes if ep['id'] in keep_episode_ids)
         episodes_to_delete = [ep['episodeFileId'] for ep in episodes_with_files if ep['seasonNumber'] < last_watched_season and ep['id'] not in keep_episode_ids]
@@ -225,48 +207,38 @@ def delete_old_episodes(series_id, keep_episode_ids):
 
     delete_episodes_in_sonarr(episodes_to_delete)
 
+def process_episodes_based_on_rules(series_id, season_number, episode_number, rule):
+    """Fetch, monitor/search, and delete episodes based on defined rules."""
+    all_episodes = fetch_all_episodes(series_id)
+    last_watched_id = next(ep['id'] for ep in all_episodes if ep['seasonNumber'] == season_number and ep['episodeNumber'] == episode_number)
+
+    if not rule['monitor_watched']:
+        unmonitor_episodes([last_watched_id])
+
+    next_episode_ids = fetch_next_episodes(series_id, season_number, episode_number, rule['get_option'])
+    monitor_or_search_episodes(next_episode_ids, rule['action_option'])
+
+    episodes_to_delete = find_episodes_to_delete(all_episodes, rule['keep_watched'], last_watched_id)
+    delete_episodes_in_sonarr(episodes_to_delete)
+
+    if rule['keep_watched'] != "all":
+        keep_episode_ids = next_episode_ids + [last_watched_id]
+        delete_old_episodes(series_id, keep_episode_ids)
 
 def main():
     series_name, season_number, episode_number = get_server_activity()
     if series_name:
         series_id = get_series_id(series_name)
-        logger.info(f"Fetched series ID: {series_id} for series: {series_name}")
         if series_id:
-            # Determine which rule to apply
-            rule_name = next((rule_name for rule_name, rule_data in config['rules'].items() if str(series_id) in rule_data.get('series', [])), 'default')
-            rule = config['rules'].get(rule_name, config['rules']['default'])
-
-            get_option = rule['get_option']
-            action_option = rule['action_option']
-            keep_watched = rule['keep_watched']
-            monitor_watched = rule['monitor_watched']
-
-            if get_option == 'sonarr' and keep_watched == 'sonarr' and action_option == 'sonarr':
-                logger.info(f"Processing skipped for {series_name} as per Sonarr setup.")
-                return
-
-            all_episodes = fetch_all_episodes(series_id)
-            if all_episodes:
-                next_episode_ids = fetch_next_episodes(series_id, season_number, episode_number, get_option)
-                if next_episode_ids:
-                    monitor_episodes(next_episode_ids, monitor=True)
-                    if action_option == "search":
-                        trigger_episode_search_in_sonarr(next_episode_ids)
-
-                    last_watched_id = next(ep['id'] for ep in all_episodes if ep['seasonNumber'] == season_number and ep['episodeNumber'] == episode_number)
-                    episodes_to_delete = find_episodes_to_delete(all_episodes, keep_watched, last_watched_id)
-                    delete_episodes_in_sonarr(episodes_to_delete)
-
-                    keep_episode_ids = next_episode_ids + [last_watched_id]
-                    delete_old_episodes(series_id, keep_episode_ids)
-                else:
-                    logger.info("No next episodes found to monitor.")
+            rule = next((details for key, details in config['rules'].items() if str(series_id) in details.get('series', [])), None)
+            if rule:
+                process_episodes_based_on_rules(series_id, season_number, episode_number, rule)
             else:
-                logger.info("No episodes found for the current series.")
+                logger.info(f"No rule found for series ID {series_id}. Skipping operations.")
         else:
-            logger.info(f"Series ID not found for series: {series_name}")
+            logger.error(f"Series ID not found for series: {series_name}")
     else:
-        logger.info("No server activity found.")
+        logger.error("No server activity found.")
 
 if __name__ == "__main__":
     main()

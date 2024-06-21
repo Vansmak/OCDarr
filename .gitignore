@@ -1,8 +1,12 @@
 __pycache__/
 venv/
-app.log
-preferences.json
+
 README.md
 .env
+# Ignore node_modules
+node_modules/
+# Ignore log files
 logs/
-temp/
+# Ignore temp and config contents
+/temp/* 
+/config/*

@@ -1,4 +1,9 @@
 *.pyc
 __pycache__/
 .env
-
+# Ignore node_modules
+node_modules/
+# Ignore log files
+logs/
+# Ignore temp and config contents
+/temp/* /config/*

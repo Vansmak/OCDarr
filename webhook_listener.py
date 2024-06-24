@@ -47,7 +47,7 @@ def load_config():
                     'action_option': 'monitor',
                     'keep_watched': 'season',
                     'monitor_watched': False,
-                    'series': ['series_id1', 'series_id2']
+                    'series': [ ]
                 }
             }
         }

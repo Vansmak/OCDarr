@@ -152,7 +152,10 @@
                 <span class="disclaimer">(will override current assignments)</span>
             </form>
         
-            
+            <form id="unassign-rules-form" method="POST" action="{{ url_for('unassign_rules') }}">
+                <input type="hidden" name="assign_rule_name" value="{{ rule_name }}">
+                <button type="submit" class="btn btn-secondary">Unassign checked shows from above rule</button>
+            </form>
         </div>
         
         

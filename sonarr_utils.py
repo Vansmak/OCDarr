@@ -70,7 +70,7 @@ def fetch_series_and_episodes(preferences):
 
     # Sort series and return only the top 
     active_series.sort(key=lambda series: series['dateAdded'], reverse=True)
-    return active_series[:99]
+    return active_series[:12]
 
 
 def fetch_upcoming_premieres(preferences):

@@ -1,8 +1,9 @@
 __pycache__/
 venv/
-app.log
+node_modules
 preferences.json
 README.md
 .env
-logs/
-temp/
+/logs/*
+/temp/*
+/config/*

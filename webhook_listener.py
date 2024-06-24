@@ -6,33 +6,28 @@ import json
 import sonarr_utils
 from datetime import datetime
 from dotenv import load_dotenv
-import sys
 
 app = Flask(__name__)
 
-# Define the format for logging
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
+# Load environment variables from .env file
+load_dotenv()
 
-# Setup logging to avoid duplicate entries
-for handler in app.logger.handlers:
-    app.logger.removeHandler(handler)
+# Load environment variables
+SONARR_URL = os.getenv('SONARR_URL')
+SONARR_API_KEY = os.getenv('SONARR_API_KEY')
+MISSING_LOG_PATH = os.getenv('MISSING_LOG_PATH', '/app/logs/missing.log')
 
-file_handler = logging.FileHandler(os.getenv('LOG_PATH', '/app/logs/app.log'))
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(logging.Formatter(log_format))
-app.logger.addHandler(file_handler)
+# Setup logging to capture all logs
+logging.basicConfig(filename=os.getenv('LOG_PATH', '/app/logs/app.log'), 
+                    level=logging.DEBUG if os.getenv('FLASK_DEBUG', 'false').lower() == 'true' else logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
-if os.getenv('FLASK_DEBUG', 'false').lower() == 'true':
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG)
-    console_handler.setFormatter(logging.Formatter(log_format))
-    app.logger.addHandler(console_handler)
-    app.logger.setLevel(logging.DEBUG)
-else:
-    app.logger.setLevel(logging.INFO)
-
-# Stop Flask's logger from handling the same logs
-app.logger.propagate = False
+# Adding stream handler to also log to console for Docker logs to capture
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.DEBUG if os.getenv('FLASK_DEBUG', 'false').lower() == 'true' else logging.INFO)
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+stream_handler.setFormatter(formatter)
+app.logger.addHandler(stream_handler)
 
 # Configuration management
 config_path = os.path.join(app.root_path, 'config', 'config.json')
@@ -40,118 +35,125 @@ config_path = os.path.join(app.root_path, 'config', 'config.json')
 def load_config():
     try:
         with open(config_path, 'r') as file:
-            return json.load(file)
+            config = json.load(file)
+        if 'rules' not in config:
+            config['rules'] = {}
+        return config
     except FileNotFoundError:
         default_config = {
-            'get_option': 'episode',
-            'action_option': 'search',
-            'already_watched': 'keep',
-            'always_keep': []
+            'rules': {
+                'full_seasons': {
+                    'get_option': 'season',
+                    'action_option': 'monitor',
+                    'keep_watched': 'season',
+                    'monitor_watched': False,
+                    'series': [ ]
+                }
+            }
         }
         save_config(default_config)
         return default_config
-
-def normalize_name(name):
-    return ' '.join(word.capitalize() for word in name.replace('_', ' ').split())
 
 def save_config(config):
     with open(config_path, 'w') as file:
         json.dump(config, file, indent=4)
 
+def normalize_name(name):
+    return ' '.join(word.capitalize() for word in name.replace('_', ' ').split())
+
+def get_missing_log_content():
+    try:
+        with open(MISSING_LOG_PATH, 'r') as file:
+            return file.read()
+    except FileNotFoundError:
+        return "No missing entries logged."
+    except Exception as e:
+        app.logger.error(f"Failed to read missing log: {str(e)}")
+        return "Failed to read log."
+
 @app.route('/')
 def home():
-    app.logger.debug("Loading the home page")
     config = load_config()
     preferences = sonarr_utils.load_preferences()
-    current_series = upcoming_premieres = None
+    current_series = sonarr_utils.fetch_series_and_episodes(preferences)
+    upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
+    all_series = sonarr_utils.get_series_list(preferences)  # Ensure this function fetches series info
+    
+    # Build a dictionary that maps series IDs to their assigned rules
+    rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() for series_id in details.get('series', [])}
 
-    try:
-        current_series = sonarr_utils.fetch_series_and_episodes(preferences)
-    except Exception as e:
-        app.logger.error(f"Failed to fetch current series: {e}")
-        current_series = None
+    # Annotate each series with its assigned rule or 'None'
+    for series in all_series:
+        series['assigned_rule'] = rules_mapping.get(str(series['id']), 'None')
 
-    try:
-        upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
-    except Exception as e:
-        app.logger.error(f"Failed to fetch upcoming premieres: {e}")
-        upcoming_premieres = None
+    missing_log_content = get_missing_log_content()  # Fetch the missing log content here
 
-    # Fetch prime series to add indicator
-    try:
-        prime_series = sonarr_utils.fetch_tagged_series_names(preferences, 2)
-        prime_series_ids = {series['id'] for series in prime_series}
-        for series in current_series:
-            series['is_prime'] = series['id'] in prime_series_ids
-    except Exception as e:
-        app.logger.error(f"Failed to fetch prime series: {e}")
+    rule = request.args.get('rule', 'full_seasons')  # Get the rule parameter from the request
 
     return render_template('index.html', config=config, current_series=current_series, 
-                           upcoming_premieres=upcoming_premieres)
-
-
-
-@app.route('/settings')
-def settings():
-    config = load_config()
-    message = request.args.get('message', '')
-    sonarr_url = os.getenv('SONARR_URL') + '/add/new' 
-    return render_template('settings.html', config=config, message=message, sonarr_url=sonarr_url)
-
-
+                           upcoming_premieres=upcoming_premieres, all_series=all_series, 
+                           sonarr_url=SONARR_URL, missing_log=missing_log_content, rule=rule)
 
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
     config = load_config()
     
-    # Update the configuration with form data
-    get_option = request.form.get('get_option')
-    if get_option.isdigit():  # If it's a number, convert to int
-        config['get_option'] = int(get_option)
-    else:
-        config['get_option'] = get_option  # Otherwise, save as string
-
-    action_option = request.form.get('action_option')
-    config['action_option'] = action_option
-
-    already_watched = request.form.get('already_watched')
-    if already_watched.isdigit():  # Handling numbers for episodes to keep
-        config['already_watched'] = int(already_watched)
-    else:
-        config['already_watched'] = already_watched
-
-    always_keep = request.form.get('always_keep', '').split(',')
-    config['always_keep'] = [normalize_name(name.strip()) for name in always_keep if name.strip()]  # Normalize and save
-
+    rule_name = request.form.get('rule_name')
+    if rule_name == 'add_new':
+        rule_name = request.form.get('new_rule_name')
+        if not rule_name:
+            return redirect(url_for('home', section='settings', message="New rule name is required."))
     
+    get_option = request.form.get('get_option')
+    keep_watched = request.form.get('keep_watched')
 
-    save_config(config)  # Save the updated configuration
-
-    # Redirect back to the settings section with a success message
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return redirect(url_for('home', section='settings', message=f"Settings updated successfully on {current_time}"))
-
-@app.route('/logs')
-def show_logs():
-    log_type = request.args.get('type', 'app')  # Default to 'app', could also be 'error'
-
-    # Define log file paths
-    log_paths = {
-        'app': '/app/logs/app.log',
-        'error': '/app/logs/app.error.log'
+    config['rules'][rule_name] = {
+        'get_option': get_option,
+        'action_option': request.form.get('action_option'),
+        'keep_watched': keep_watched,
+        'monitor_watched': request.form.get('monitor_watched', 'false').lower() == 'true',
+        'series': config['rules'].get(rule_name, {}).get('series', [])
     }
-    log_path = log_paths.get(log_type, log_paths['app'])  # Fallback to app.log if type is unknown
+    
+    save_config(config)
+    return redirect(url_for('home', section='settings', message="Settings updated successfully"))
 
-    # Try to read the log file
-    try:
-        with open(log_path, 'r') as file:
-            logs = file.read()
-    except FileNotFoundError:
-        logs = "Log file not found."
+@app.route('/delete_rule', methods=['POST'])
+def delete_rule():
+    config = load_config()
+    rule_name = request.form.get('rule_name')
+    if rule_name and rule_name in config['rules']:
+        del config['rules'][rule_name]
+        save_config(config)
+        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' deleted successfully."))
+    else:
+        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' not found."))
 
-    return jsonify(logs=logs)
+@app.route('/assign_rules', methods=['POST'])
+def assign_rules():
+    config = load_config()
+    rule_name = request.form.get('assign_rule_name')
+    submitted_series_ids = set(request.form.getlist('series_ids'))
 
+    if rule_name == 'None':
+        # Remove series from any rule
+        for key, details in config['rules'].items():
+            details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
+    else:
+        # Update the rule's series list to include only those submitted
+        if rule_name in config['rules']:
+            current_series = set(config['rules'][rule_name]['series'])
+            updated_series = current_series.union(submitted_series_ids)
+            config['rules'][rule_name]['series'] = list(updated_series)
 
+        # Update other rules to remove the series if it's no longer assigned there
+        for key, details in config['rules'].items():
+            if key != rule_name:
+                # Preserve series not submitted in other rules
+                details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
+
+    save_config(config)
+    return redirect(url_for('home', section='settings', message="Rules updated successfully."))
 
 @app.route('/trigger-wake', methods=['POST'])
 def trigger_wake():
@@ -178,28 +180,43 @@ def refresh_plex():
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Failed to send webhook: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+@app.route('/unassign_rules', methods=['POST'])
+def unassign_rules():
+    config = load_config()
+    rule_name = request.form.get('assign_rule_name')
+    submitted_series_ids = set(request.form.getlist('series_ids'))
+
+    # Update the rule's series list to exclude those submitted
+    if rule_name in config['rules']:
+        current_series = set(config['rules'][rule_name]['series'])
+        updated_series = current_series.difference(submitted_series_ids)
+        config['rules'][rule_name]['series'] = list(updated_series)
+
+    save_config(config)
+    return redirect(url_for('home', section='settings', message="Rules updated successfully."))
+
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
-    data = request.json  # Assuming data is properly formatted JSON from Tautulli
-    if not data:
-        app.logger.error("No data received from webhook")
-        return jsonify({'status': 'error', 'message': 'No data received'}), 400
-
-    try:
-        # Write the received data to a temporary file
-        with open('/app/temp/data_from_tautulli.json', 'w') as f:
-            json.dump(data, f)
-
-        # Trigger the script processing
-        result = subprocess.run(["python3", "/app/servertosonarr.py"], capture_output=True, text=True)
-        if result.stderr:
-            app.logger.error("Errors from servertosonarr.py: " + result.stderr)
-            return jsonify({'status': 'error', 'message': 'Script execution failed'}), 500
-        
+    app.logger.info("Received POST request from Tautulli")
+    data = request.json
+    if data:
+        app.logger.info(f"Webhook received with data: {data}")
+        try:
+            temp_dir = '/app/temp'
+            os.makedirs(temp_dir, exist_ok=True)
+            with open(os.path.join(temp_dir, 'data_from_tautulli.json'), 'w') as f:
+                json.dump(data, f)
+            app.logger.info("Data successfully written to data_from_tautulli.json")
+            result = subprocess.run(["python3", "/app/servertosonarr.py"], capture_output=True, text=True)
+            if result.stderr:
+                app.logger.error("Errors from servertosonarr.py: " + result.stderr)
+        except Exception as e:
+            app.logger.error(f"Failed to handle data or run script: {e}")
+            return jsonify({'status': 'error', 'message': str(e)}), 500
         return jsonify({'status': 'success', 'message': 'Script triggered successfully'}), 200
-    except Exception as e:
-        app.logger.error(f"Failed to handle data or run script: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    else:
+        return jsonify({'status': 'error', 'message': 'No data received'}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')

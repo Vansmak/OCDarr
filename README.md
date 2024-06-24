@@ -27,10 +27,10 @@ Start by cloning the repository and navigating into the directory:
 git clone https://github.com/Vansmak/OCDarr.git
 cd OCDarr
 ```
- After cloning the repository, switch to the dev branch:
+ After cloning the repository, switch to the main branch:
 ```
    cd OCDarr
-   git checkout dev
+   git checkout main
 ```
 Configuration
 Environment Setup
@@ -93,7 +93,7 @@ Docker Instructions
 
    Pull the Docker Image
 ```
-    docker pull vansmak/ocdarr_dev:arch64 amd64
+    docker pull vansmak/ocdarr:arch64 or amd64
 ```
   
 
@@ -108,15 +108,14 @@ Docker Instructions
   Run the Docker Container
 ```
     docker run -d \
-      --env-file=.env \
+      --env-file .env \
       --env CONFIG_PATH=/app/config/config.json \
       -p 5001:5001 \
-      -v $(pwd):/app \
-      -v $(pwd)/logs:/app/logs \
-      -v $(pwd)/config:/app/config \
-      -v $(pwd)/temp:/app/temp \
+      -v ${PWD}/logs:/app/logs \
+      -v ${PWD}/config:/app/config \
+      -v ${PWD}/temp:/app/temp \
       --restart unless-stopped \
-      vansmak/ocdarr:tagname
+      vansmak/ocdarr:amd64,arm64
 
 ```
 ###Usage

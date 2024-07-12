@@ -6,40 +6,25 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Series Manager</title>
-    <script>
-        function toggleNewRuleName() {
-            var ruleNameSelect = document.getElementById("rule_name");
-            var newRuleNameGroup = document.getElementById("new_rule_name_group");
-            if (ruleNameSelect.value === "add_new") {
-                newRuleNameGroup.style.display = "block";
-            } else {
-                newRuleNameGroup.style.display = "none";
-            }
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-            toggleNewRuleName();  // Ensure it runs on page load in case 'Add New' is already selected
-        });
-    </script>
 </head>
 <body>
     <div class="container">
         <div class="menu my-3">
-            <span onclick="showSection('current')" class="menu-icon active">
-                Watching
-            </span>
+            <span onclick="showSection('current')" class="menu-icon active">Watching</span>
             <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="Settings" class="logo-icon" onclick="showSection('settings')">
-            <span onclick="showSection('upcoming')" class="menu-icon">
-                Premiering
-            </span>
+            <span onclick="showSection('upcoming')" class="menu-icon">Premiering</span>
         </div>
 
         <div id="current" class="series-container">
             <div class="row">
                 {% for series in current_series %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-0">
                     <div class="poster-wrapper">
                         <a href="{{ series.sonarr_series_url }}">
                             <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid poster">
+                            {% if series.tag_id == 2 %}
+                            <img src="{{ url_for('static', filename='prime_icon.png') }}" alt="Prime Icon" class="prime-icon">
+                            {% endif %}
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -53,10 +38,13 @@
         <div id="upcoming" class="series-container" style="display: none;">
             <div class="row">
                 {% for premiere in upcoming_premieres %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-1">
                     <div class="poster-wrapper">
                         <a href="{{ premiere.sonarr_series_url }}">
                             <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid poster">
+                            {% if premiere.tag_id == 2 %}
+                            <img src="{{ url_for('static', filename='prime_icon.png') }}" alt="Prime Icon" class="prime-icon">
+                            {% endif %}
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -67,6 +55,10 @@
                 {% endfor %}
             </div>
         </div>
+
+        
+
+
 
         <div id="settings" style="display: none;">
             <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">

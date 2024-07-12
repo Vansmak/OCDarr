@@ -6,6 +6,7 @@ import json
 import sonarr_utils
 from datetime import datetime
 from dotenv import load_dotenv
+import requests  # Add this import statement
 
 app = Flask(__name__)
 
@@ -77,22 +78,23 @@ def home():
     preferences = sonarr_utils.load_preferences()
     current_series = sonarr_utils.fetch_series_and_episodes(preferences)
     upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
-    all_series = sonarr_utils.get_series_list(preferences)  # Ensure this function fetches series info
+    all_series = sonarr_utils.get_series_list(preferences)
     
-    # Build a dictionary that maps series IDs to their assigned rules
+    # Debugging: Print current series data
+    app.logger.info(f"Current series data: {current_series}")
+    
     rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() for series_id in details.get('series', [])}
 
-    # Annotate each series with its assigned rule or 'None'
     for series in all_series:
         series['assigned_rule'] = rules_mapping.get(str(series['id']), 'None')
 
-    missing_log_content = get_missing_log_content()  # Fetch the missing log content here
-
-    rule = request.args.get('rule', 'full_seasons')  # Get the rule parameter from the request
+    missing_log_content = get_missing_log_content()
+    rule = request.args.get('rule', 'full_seasons')
 
     return render_template('index.html', config=config, current_series=current_series, 
                            upcoming_premieres=upcoming_premieres, all_series=all_series, 
                            sonarr_url=SONARR_URL, missing_log=missing_log_content, rule=rule)
+
 
 @app.route('/update-settings', methods=['POST'])
 def update_settings():

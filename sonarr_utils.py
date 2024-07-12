@@ -48,6 +48,9 @@ def fetch_series_and_episodes(preferences):
     series_list = series_response.json() if series_response.ok else []
 
     for series in series_list:
+        # Print the series title and its tags for debugging
+        print(f"Series: {series['title']}, Tags: {series.get('tags')}")
+        
         episodes_url = f"{SONARR_URL}/api/v3/episode"
         params = {'seriesId': series['id']}
         episodes_response = requests.get(episodes_url, headers=headers, params=params)
@@ -57,20 +60,21 @@ def fetch_series_and_episodes(preferences):
             if episode.get('monitored') and episode.get('hasFile'):
                 episode_file_details = fetch_episode_file_details(episode['episodeFileId'])
                 if episode_file_details and 'dateAdded' in episode_file_details:
-                    # Parse and make dateAdded offset-aware
                     date_added = datetime.fromisoformat(episode_file_details['dateAdded'].replace('Z', '+00:00'))
                     active_series.append({
                         'name': series['title'],
                         'latest_monitored_episode': f"S{episode['seasonNumber']}E{episode['episodeNumber']} - {episode['title']}",
                         'artwork_url': f"{SONARR_URL}/api/v3/mediacover/{series['id']}/poster.jpg?apikey={SONARR_API_KEY}",
                         'sonarr_series_url': f"{SONARR_URL}/series/{series['titleSlug']}",
-                        'dateAdded': date_added
+                        'dateAdded': date_added,
+                        'tag_id': 2 if 2 in series.get('tags', []) else None  # Check if tag_id 2 is in the tags list
                     })
-                    break  # Since we're only interested in the latest episode per series that meets the criteria
+                    break
 
-    # Sort series and return only the top 
     active_series.sort(key=lambda series: series['dateAdded'], reverse=True)
     return active_series[:12]
+
+
 
 
 def fetch_upcoming_premieres(preferences):

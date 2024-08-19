@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import subprocess
 import os
+import time
 import logging
 import json
 import sonarr_utils
@@ -30,8 +31,18 @@ formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 stream_handler.setFormatter(formatter)
 app.logger.addHandler(stream_handler)
 
+# Define the services dictionary
+services = {
+    "Plex": "http://192.168.254.205:32400/web",
+    "Sonarr": "http://192.168.254.205:8989",
+    "Radarr": "http://192.168.254.205:7878",
+    "Tautulli": "http://192.168.254.205:8181",
+    "SABnzbd": "http://192.168.254.205:8080"
+}
+
 # Configuration management
 config_path = os.path.join(app.root_path, 'config', 'config.json')
+TIMESTAMP_FILE_PATH = '/app/backgrounds/fanart_timestamp.txt'
 
 def load_config():
     try:
@@ -48,19 +59,15 @@ def load_config():
                     'action_option': 'monitor',
                     'keep_watched': 'season',
                     'monitor_watched': False,
-                    'series': [ ]
+                    'series': []
                 }
             }
         }
-        save_config(default_config)
         return default_config
 
 def save_config(config):
     with open(config_path, 'w') as file:
         json.dump(config, file, indent=4)
-
-def normalize_name(name):
-    return ' '.join(word.capitalize() for word in name.replace('_', ' ').split())
 
 def get_missing_log_content():
     try:
@@ -72,15 +79,36 @@ def get_missing_log_content():
         app.logger.error(f"Failed to read missing log: {str(e)}")
         return "Failed to read log."
 
+def should_fetch_new_image():
+    """Check if a new image should be fetched based on the last fetch timestamp."""
+    if not os.path.exists(TIMESTAMP_FILE_PATH):
+        return True  # File doesn't exist, so fetch a new image
+
+    with open(TIMESTAMP_FILE_PATH, 'r') as file:
+        last_fetch_time = float(file.read().strip())
+
+    current_time = time.time()
+    # Check if 4 hours (21600 seconds) have passed since the last fetch
+    return (current_time - last_fetch_time) >= 21600
+
+def update_timestamp():
+    """Update the timestamp file with the current time."""
+    with open(TIMESTAMP_FILE_PATH, 'w') as file:
+        file.write(str(time.time()))
+
+# Update the home route
 @app.route('/')
 def home():
+    if should_fetch_new_image():
+        sonarr_utils.fetch_random_fanart()
+        update_timestamp()
+    
     config = load_config()
     preferences = sonarr_utils.load_preferences()
     current_series = sonarr_utils.fetch_series_and_episodes(preferences)
     upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
     all_series = sonarr_utils.get_series_list(preferences)
     
-    # Debugging: Print current series data
     app.logger.info(f"Current series data: {current_series}")
     
     rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() for series_id in details.get('series', [])}
@@ -91,9 +119,12 @@ def home():
     missing_log_content = get_missing_log_content()
     rule = request.args.get('rule', 'full_seasons')
 
+    service_status = {name: check_service_status(url) for name, url in services.items()}
+
     return render_template('index.html', config=config, current_series=current_series, 
                            upcoming_premieres=upcoming_premieres, all_series=all_series, 
-                           sonarr_url=SONARR_URL, missing_log=missing_log_content, rule=rule)
+                           sonarr_url=SONARR_URL, missing_log=missing_log_content, rule=rule,
+                           service_status=service_status, services=services)
 
 
 @app.route('/update-settings', methods=['POST'])
@@ -157,32 +188,6 @@ def assign_rules():
     save_config(config)
     return redirect(url_for('home', section='settings', message="Rules updated successfully."))
 
-@app.route('/trigger-wake', methods=['POST'])
-def trigger_wake():
-    webhook_url = "http://192.168.254.64:8123/api/webhook/wakeoffice"
-    try:
-        response = requests.post(webhook_url)  # POST request to the webhook URL
-        if response.status_code == 200:
-            return jsonify({'status': 'success', 'message': 'Webhook triggered successfully'}), 200
-        else:
-            return jsonify({'status': 'error', 'message': 'Webhook failed with status code: ' + str(response.status_code)}), 500
-    except requests.exceptions.RequestException as e:
-        app.logger.error(f"Failed to send webhook: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-    
-@app.route('/refresh-plex', methods=['POST'])
-def refresh_plex():
-    webhook_url = "http://192.168.254.64:8123/api/webhook/update_library"
-    try:
-        response = requests.post(webhook_url)  # POST request to the webhook URL
-        if response.status_code == 200:
-            return jsonify({'status': 'success', 'message': 'Webhook triggered successfully'}), 200
-        else:
-            return jsonify({'status': 'error', 'message': 'Webhook failed with status code: ' + str(response.status_code)}), 500
-    except requests.exceptions.RequestException as e:
-        app.logger.error(f"Failed to send webhook: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-    
 @app.route('/unassign_rules', methods=['POST'])
 def unassign_rules():
     config = load_config()
@@ -219,6 +224,15 @@ def handle_server_webhook():
         return jsonify({'status': 'success', 'message': 'Script triggered successfully'}), 200
     else:
         return jsonify({'status': 'error', 'message': 'No data received'}), 400
+
+def check_service_status(url):
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            return "Online"
+    except requests.exceptions.RequestException:
+        return "Offline"
+    return "Offline"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')

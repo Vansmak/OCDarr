@@ -25,6 +25,7 @@ SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 LOG_PATH = os.getenv('LOG_PATH', '/app/logs/app.log')
 MISSING_LOG_PATH = os.getenv('MISSING_LOG_PATH', '/app/logs/missing.log')
 
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
@@ -239,11 +240,13 @@ def process_episodes_based_on_rules(series_id, season_number, episode_number, ru
         keep_episode_ids = next_episode_ids + [last_watched_id]
         delete_old_episodes(series_id, keep_episode_ids, rule)
 
+
 def main():
     series_name, season_number, episode_number = get_server_activity()
     if series_name:
         series_id = get_series_id(series_name)
         if series_id:
+            
             rule = next((details for key, details in config['rules'].items() if str(series_id) in details.get('series', [])), None)
             if rule:
                 logger.info(f"Applying rule: {rule}")
@@ -258,3 +261,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

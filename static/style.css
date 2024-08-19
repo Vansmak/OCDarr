@@ -2,8 +2,8 @@ body {
     margin: 0;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
-    background-image: url('https://wallpapercave.com/wp/wp9218666.jpg');
+    overflow: auto; /* Enable scrolling */
+    background-image: url('http://192.168.254.64:8123/local/plex_backgrounds/fanart.jpg?v=timestamp');
     background-size: 565%; /* Adjust to fit your needs */
     background-position: calc(100% + 20px) -137px; /* Move the image to the right and up */
     background-repeat: no-repeat;
@@ -14,35 +14,26 @@ body {
     font-family: Arial, sans-serif;
 }
 
-
-  
-  
-
-
 .container {
-    padding-left: 10px; 
-    padding-right: 10px; 
-    background: transparent; 
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .menu {
     display: flex;
-    align-items: center; /* Center align the logo and menu items */
-    justify-content: center; /* Center the menu items */
-    margin-bottom: 10px;
-    font-size: 14px;
-    text-align: center;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     background: rgba(0, 0, 0, 0.5);
-    padding: 0px;
+    padding: 5px;
     border-radius: 10px;
+    height: 50px;
 }
 
-.menu span {
+.menu span, .menu img {
     cursor: pointer;
     color: #FFF;
-    padding: 10px 10px; /* Adjust padding for more compact spacing */
-    margin: 0 5px; /* Reduce margin for closer spacing */
+    margin: 0 5px;
     text-decoration: none;
 }
 
@@ -51,26 +42,25 @@ body {
 }
 
 .logo-icon {
-    width: 60px; /* Adjust the size as needed */
+    width: 50px; /* Adjust the size as needed */
     height: auto;
-    margin: 0 10px; /* Center align the logo */
+    flex-shrink: 0;
 }
 
 .series-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
-    margin: 0 auto;
-    background: transparent; 
+    background: transparent;
 }
 
 .series-item {
     padding: 0;
     text-align: center;
     position: relative;
-    margin: 0px;
+    margin: 5px;
     flex: 0 0 calc(33.333% - 10px);
-    background: transparent; 
+    background: transparent;
 }
 
 .poster-wrapper {
@@ -80,33 +70,42 @@ body {
 }
 
 .poster {
-    width: 100px;
-    height: 150px;
+    width: 75px;
+    height: 120px;
     object-fit: cover;
     display: block;
     margin: 0 auto;
-    background: transparent; 
-
+    background: transparent;
     border-radius: 10px;
+}
+
+.prime-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    z-index: 10;
 }
 
 .series-info {
     margin-top: 1px;
     font-size: 12px;
     line-height: 1.2;
-    background: transparent; 
+    background: transparent;
 }
 
 .episode-number, .episode-title {
     font-size: 10px;
     margin-bottom: 0px;
     word-wrap: break-word;
+    margin-top: 0px;
 }
 
 .premiere-date {
     font-size: 10px;
-    margin-bottom: 0;
-    margin-top: -10px; /* Adjust this value to move the date up or down */
+    margin-bottom: 0px;
+    margin-top: 0px;
 }
 
 .alert {
@@ -115,7 +114,7 @@ body {
 }
 
 .form-group {
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 label {
@@ -124,8 +123,8 @@ label {
 
 input[type="text"], select {
     width: 100%;
-    padding: 8px;
-    margin: 6px 0;
+    padding: 5px;
+    margin: 4px 0;
 }
 
 button {
@@ -136,7 +135,7 @@ button {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
     cursor: pointer;
 }
 
@@ -177,16 +176,16 @@ button {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-    width: 100%; /* Ensure it takes up the full width for better alignment */
+    width: 100%;
 }
 
 .checkbox-item input[type="checkbox"] {
-    margin-right: 10px; /* Space between checkbox and label */
+    margin-right: 5px;
 }
 
 .checkbox-item label {
     margin: 0;
-    white-space: nowrap; /* Prevent wrapping for titles */
+    white-space: nowrap;
 }
 
 .rule-header {
@@ -194,202 +193,13 @@ button {
     align-items: center;
     justify-content: space-between;
     background-color: #444;
-    padding: 10px;
+    padding: 5px;
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .disclaimer {
-    font-size: 12px;
-    color: #ff0000; /* Red color to make the disclaimer stand out */
-    margin-left: 10px;
-}
-.container {
-    padding-left: 10px;
-    padding-right: 10px;
-    background: transparent;  /* Ensure background is transparent */
-}
-
-.menu {
-    display: flex;
-    justify-content: space-between; /* Adjusts children to have space between them */
-    align-items: center; /* Vertically centers all items in the menu */
-    width: 100%; /* Ensures the menu uses the full width */
-    background: rgba(0, 0, 0, 0.5); /* Background styling */
-    padding: 10px;
-    border-radius: 10px; /* Rounded corners for the menu */
-    height: 50px;
-}
-
-.menu-icon, .logo-icon {
-    cursor: pointer; /* Ensures that the spans are clickable */
-    text-decoration: none;
-    color: #FFF; /* White text color */
-    margin: 0 10px; /* Margins to ensure spacing around items */
-}
-
-.logo-icon {
-    width: 60px; /* Adjust the size as needed */
-    height: auto; /* Maintains the aspect ratio */
-    flex-shrink: 0; /* Prevents the logo from shrinking */
-}
-
-.menu span {
-    cursor: pointer;
-    color: #FFF;
-    padding: 10px 0;
-    margin: 0 10px;
-    text-decoration: none;
-}
-
-.menu span.active {
-    border-bottom: 2px solid #FFF;
-}
-
-.logo-icon {
-    width: 60px; /* Adjust the size as needed */
-    height: auto; /* Maintains the aspect ratio */
-    flex-shrink: 0; /* Prevents the logo from shrinking */
-}
-
-
-.series-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin: 0 auto;
-    background: transparent; /* Ensure background is transparent */
-}
-
-
-@media (min-width: 768px) { /* Styles for larger screens */
-    .series-container {
-        max-width: 1200px; /* Limiting the maximum width */
-        margin: 0 auto; /* Ensures it stays centered */
-        padding-left: 120px; /* Adds some padding on the sides */
-    }
-}
-
-
-.series-item {
-    padding: 0;
-    text-align: center;
-    position: relative;
-    margin: 5px;
-    flex: 0 0 calc(33.333% - 10px);
-    background: transparent; /* Ensure background is transparent */
-}
-
-
-
-
-.poster-wrapper {
-    position: relative; /* Add relative positioning */
-    width: 100%;
-    margin: 0 auto;
-}
-
-.poster {
-    width: 100%; /*set fixed width for the poster */
-    
-    object-fit: cover;
-    display: block;
-    margin: 0 auto;
-    background: transparent; /* Ensure background is transparent */
-}
-
-/* Media query for mobile devices */
-@media (max-width: 768px) {  /* This will target screens smaller than 768px */
-    .poster {
-        width: 100px;  /* Fixed width for mobile */
-        height: 150px; /* Fixed height for mobile */
-        object-fit: contain; /* Ensure the whole image fits within the dimensions */
-    }
-}
-
-.prime-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    z-index: 10;
-}
-
-.series-info {
-    margin-top: 1px;
-    font-size: 12px;
-    line-height: 1.2;
-    background: transparent; 
-}
-
-.episode-number, .episode-title {
     font-size: 10px;
-    margin-bottom: 1px;
-    word-wrap: break-word;
-}
-
-.premiere-date {
-    font-size: 10px;
-    margin-bottom: 0;
-    margin-top: -10px; /* Adjust this value to move the date up or down */
-}
-
-.alert {
-    color: green;
-    text-align: center;
-}
-
-.form-group {
-    margin: 10px 0;
-}
-
-label {
-    display: block;
-}
-
-input[type="text"], select {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-}
-
-button {
-    width: 100%;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-.btn-link {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    color: black;
-}
-
-.btn-info {
-    background-color: #17a2b8;
-    color: white;
+    color: #ff0000;
+    margin-left: 5px;
 }

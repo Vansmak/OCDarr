@@ -6,6 +6,20 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Series Manager</title>
+    <script>
+        function toggleNewRuleName() {
+            var ruleNameSelect = document.getElementById("rule_name");
+            var newRuleNameGroup = document.getElementById("new_rule_name_group");
+            if (ruleNameSelect.value === "add_new") {
+                newRuleNameGroup.style.display = "block";
+            } else {
+                newRuleNameGroup.style.display = "none";
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleNewRuleName();  // Ensure it runs on page load in case 'Add New' is already selected
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -18,13 +32,10 @@
         <div id="current" class="series-container">
             <div class="row">
                 {% for series in current_series %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-0">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
                     <div class="poster-wrapper">
                         <a href="{{ series.sonarr_series_url }}">
                             <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid poster">
-                            {% if series.tag_id == 2 %}
-                            <img src="{{ url_for('static', filename='prime_icon.png') }}" alt="Prime Icon" class="prime-icon">
-                            {% endif %}
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -38,13 +49,10 @@
         <div id="upcoming" class="series-container" style="display: none;">
             <div class="row">
                 {% for premiere in upcoming_premieres %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-1">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
                     <div class="poster-wrapper">
                         <a href="{{ premiere.sonarr_series_url }}">
                             <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid poster">
-                            {% if premiere.tag_id == 2 %}
-                            <img src="{{ url_for('static', filename='prime_icon.png') }}" alt="Prime Icon" class="prime-icon">
-                            {% endif %}
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -56,13 +64,24 @@
             </div>
         </div>
 
-        
-
-
-
         <div id="settings" style="display: none;">
+            <!-- Service Status Section -->
+            <div class="service-status" style="font-size: 0.8rem;">
+                <table class="table table-dark table-striped">
+                    
+                    <tbody>
+                        {% for name, status in service_status.items() %}
+                        <tr>
+                            <td>{{ name }}</td>
+                            <td>{{ status }}</td>
+                            <td><a href="{{ services[name] }}" target="_blank">{{ name }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
             <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
-                <h3>Manage Settings</h3>
                 <div class="form-group">
                     <label for="rule_name">Select Rule:</label>
                     <select id="rule_name" name="rule_name" class="form-control" onchange="toggleNewRuleName()">
@@ -107,14 +126,6 @@
             </form>
             
             <button class="btn btn-secondary" id="assign-rules-button" onclick="showSection('assign_rules', document.getElementById('rule_name').value)">Assign Rules</button>
-
-            <div class="form-group">
-                <button onclick="triggerWake();" class="btn btn-warning">Wake Office PC</button>
-            </div>
-           
-            <div class="form-group">
-                <button onclick="refreshPlex();" class="btn btn-info">Refresh Plex</button>
-            </div>
         </div>
         
         <div id="assign_rules" style="display: none;">

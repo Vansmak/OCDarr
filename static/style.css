@@ -3,9 +3,9 @@ body {
     height: 100vh;
     width: 100vw;
     overflow: auto; /* Enable scrolling */
-    background-image: url('http://192.168.254.64:8123/local/plex_backgrounds/fanart.jpg?v=timestamp');
+    background-image: url('https://wallpaperaccess.com/full/2272466.jpg');
     background-size: 565%; /* Adjust to fit your needs */
-    background-position: calc(100% + 20px) -137px; /* Move the image to the right and up */
+    background-position: calc(100% + 20px) -120px; /* Move the image to the right and up */
     background-repeat: no-repeat;
     background-attachment: fixed;
 

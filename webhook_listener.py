@@ -37,7 +37,7 @@ services = {
     "Sonarr": "http://192.168.254.205:8989",
     "Radarr": "http://192.168.254.205:7878",
     "Tautulli": "http://192.168.254.205:8181",
-    "SABnzbd": "http://192.168.254.205:8080"
+    "SABnzbd": "http://sab.home"
 }
 
 # Configuration management
@@ -79,29 +79,12 @@ def get_missing_log_content():
         app.logger.error(f"Failed to read missing log: {str(e)}")
         return "Failed to read log."
 
-def should_fetch_new_image():
-    """Check if a new image should be fetched based on the last fetch timestamp."""
-    if not os.path.exists(TIMESTAMP_FILE_PATH):
-        return True  # File doesn't exist, so fetch a new image
 
-    with open(TIMESTAMP_FILE_PATH, 'r') as file:
-        last_fetch_time = float(file.read().strip())
-
-    current_time = time.time()
-    # Check if 4 hours (21600 seconds) have passed since the last fetch
-    return (current_time - last_fetch_time) >= 21600
-
-def update_timestamp():
-    """Update the timestamp file with the current time."""
-    with open(TIMESTAMP_FILE_PATH, 'w') as file:
-        file.write(str(time.time()))
 
 # Update the home route
 @app.route('/')
 def home():
-    if should_fetch_new_image():
-        sonarr_utils.fetch_random_fanart()
-        update_timestamp()
+    
     
     config = load_config()
     preferences = sonarr_utils.load_preferences()

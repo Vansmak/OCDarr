@@ -18,6 +18,9 @@ services:
       - ./logs:/app/logs
       - ./config:/app/config
       - ./temp:/app/temp
+      
+      - /mnt/samba_share/plex_backgrounds:/app/backgrounds
+
     ports:
       - "5001:5001"
     restart: unless-stopped

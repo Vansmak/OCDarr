@@ -1,0 +1,103 @@
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [2634] successfully unmonitored.
+Episodes [2635] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 525
+Successfully deleted episode file with ID: 541
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [1884] successfully unmonitored.
+Episodes [1885] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 535
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [2634] successfully unmonitored.
+Episodes [2635] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+No episodes to delete.
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [2635] successfully unmonitored.
+Episodes [2636] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 542
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [2636] successfully unmonitored.
+Episodes [2637] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 546
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [1885] successfully unmonitored.
+Episodes [1886] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 536
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['66', '4', '64', '54', '14', '55', '2', '74', '51', '19', '16', '41', '59', '27', '29', '73', '71', '1', '3', '17', '70', '31', '32', '45', '11', '18', '63', '44', '39', '20', '67', '52', '60', '23', '7', '21', '10', '15', '75', '53', '9', '25', '65', '8']}
+Episodes [1886] successfully unmonitored.
+Episodes [1887] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 547
+No rule found for series ID 76. Skipping operations.
+No rule found for series ID 76. Skipping operations.
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [2715] successfully unmonitored.
+Episodes [2716] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+No episodes to delete.
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [2637] successfully unmonitored.
+Episodes [2638] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 548
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [1887] successfully unmonitored.
+Episodes [1888] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 550
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [2716] successfully unmonitored.
+Episodes [2717] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 552
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [2638] successfully unmonitored.
+Episodes [2639] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 549
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [2638] successfully unmonitored.
+Episodes [2639] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+No episodes to delete.
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [1888] successfully unmonitored.
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['45', '59', '70', '64', '4', '76', '3', '66', '54', '63', '53', '52', '51', '73', '60', '15', '75', '23', '55', '1', '18', '29', '2', '20', '67', '31', '32', '21', '27', '41', '25', '14', '65', '11', '10', '39', '8', '44', '19', '7', '74', '9', '71', '16', '17']}
+Episodes [2717] successfully unmonitored.
+Episodes [2718] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 553
+No rule found for series ID 77. Skipping operations.
+No rule found for series ID 78. Skipping operations.
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['52', '17', '60', '44', '4', '2', '64', '59', '54', '15', '21', '9', '29', '55', '10', '16', '76', '23', '25', '73', '27', '19', '66', '71', '75', '65', '63', '67', '74', '1', '3', '39', '18', '31', '70', '20', '14', '7', '11', '51', '41', '8', '45', '32', '53', '79']}
+Episodes [2615] successfully unmonitored.
+Episodes [2616] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 544
+Applying rule: {'get_option': '1', 'action_option': 'search', 'keep_watched': '1', 'monitor_watched': False, 'series': ['52', '17', '60', '44', '4', '2', '64', '59', '54', '15', '21', '9', '29', '55', '10', '16', '76', '23', '25', '73', '27', '19', '66', '71', '75', '65', '63', '67', '74', '1', '3', '39', '18', '31', '70', '20', '14', '7', '11', '51', '41', '8', '45', '32', '53', '79']}
+Episodes [2718] successfully unmonitored.
+Episodes [2719] successfully monitored.
+Episode search command sent to Sonarr successfully.
+No episodes to delete.
+Successfully deleted episode file with ID: 558

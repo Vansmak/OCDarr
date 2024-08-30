@@ -1,0 +1,208 @@
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: auto; /* Enable scrolling */
+    background-image: url('https://wallpaperaccess.com/full/2272466.jpg');
+    background-size: 565%; /* Adjust to fit your needs */
+    background-position: calc(100% + 20px) -120px; /* Move the image to the right and up */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    color: #fff;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 10px;
+    height: 50px;
+}
+
+.menu span, .menu img {
+    cursor: pointer;
+    color: #FFF;
+    margin: 0 5px;
+    text-decoration: none;
+}
+
+.menu span.active {
+    border-bottom: 2px solid #FFF;
+}
+
+.logo-icon {
+    width: 50px; /* Adjust the size as needed */
+    height: auto;
+    flex-shrink: 0;
+}
+.series-container {
+    display: block; /* Ensure the container is block to stack items */
+    width: 100%;
+}
+
+.series-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0px; /* Reduced margin */
+}
+
+.series-info .series-title,
+.series-info .episode-info {
+    display: inline-block; /* Display inline to align on the same line */
+    margin: 0; /* Remove default margins */
+    font-size: 14px; /* Ensure consistent font size */
+}
+
+.banner-wrapper img.banner {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    opacity: 0.8;
+    margin: 0 auto; /* Center the banner */
+    border-radius: 10px; /* Optional: Rounded corners for banners */
+}
+
+.banner-wrapper img.banner:hover {
+    opacity: 1;
+}
+
+.series-info {
+    text-align: center;
+    margin-top: 0px; /* Reduced margin for tighter layout */
+    font-size: 14px; /* Font size for info */
+}
+
+.episode-info {
+    margin-top: 0px; /* Reduced margin for tighter layout */
+    display: flex; /* Align items horizontally */
+    justify-content: center; /* Center align content */
+    gap: 10px; /* Space between items */
+    flex-wrap: wrap; /* Allow wrapping if needed */
+}
+
+.episode-info h2, .episode-info p {
+    margin: 2px 0; /* Reduced margin for tighter text */
+    font-size: 14px; /* Smaller font size if needed */
+}
+
+.episode-number, .episode-title, .premiere-date {
+    font-size: 12px;
+    margin: 0 5px; /* Reduced margin between elements */
+    word-wrap: break-word;
+}
+
+.alert {
+    color: green;
+    text-align: center;
+}
+
+.form-group {
+    margin: 5px 0;
+}
+
+label {
+    display: block;
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 5px;
+    margin: 4px 0;
+}
+
+button {
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+.btn-secondary {
+    margin-right: 5px; /* Optional: Add space between buttons */
+}
+
+.row .col-6 {
+    padding: 0 5px; /* Adjust padding for equal spacing on each side */
+}
+
+.checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.checkbox-item label {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.rule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #444;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.disclaimer {
+    font-size: 10px;
+    color: #ff0000;
+    margin-left: 5px;
+}

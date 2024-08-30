@@ -6,20 +6,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Series Manager</title>
-    <script>
-        function toggleNewRuleName() {
-            var ruleNameSelect = document.getElementById("rule_name");
-            var newRuleNameGroup = document.getElementById("new_rule_name_group");
-            if (ruleNameSelect.value === "add_new") {
-                newRuleNameGroup.style.display = "block";
-            } else {
-                newRuleNameGroup.style.display = "none";
-            }
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-            toggleNewRuleName();  // Ensure it runs on page load in case 'Add New' is already selected
-        });
-    </script>
 </head>
 <body>
     <div class="container">
@@ -29,13 +15,14 @@
             <span onclick="showSection('upcoming')" class="menu-icon">Premiering</span>
         </div>
 
+        <!-- Watching Section -->
         <div id="current" class="series-container">
             <div class="row">
                 {% for series in current_series %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
-                    <div class="poster-wrapper">
+                <div class="col-12 series-item mb-3">
+                    <div class="banner-wrapper">
                         <a href="{{ series.sonarr_series_url }}">
-                            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid poster">
+                            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid banner">
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -46,13 +33,14 @@
             </div>
         </div>
 
+        <!-- Premiering Section -->
         <div id="upcoming" class="series-container" style="display: none;">
             <div class="row">
                 {% for premiere in upcoming_premieres %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
-                    <div class="poster-wrapper">
+                <div class="col-12 series-item mb-3">
+                    <div class="banner-wrapper">
                         <a href="{{ premiere.sonarr_series_url }}">
-                            <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid poster">
+                            <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid banner">
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -64,70 +52,87 @@
             </div>
         </div>
 
+        <!-- Settings Section with Subsections -->
         <div id="settings" style="display: none;">
-            <!-- Service Status Section -->
-            <div class="service-status" style="font-size: 0.8rem;">
-                <table class="table table-dark table-striped">
-                    
-                    <tbody>
-                        {% for name, status in service_status.items() %}
-                        <tr>
-                            <td>{{ name }}</td>
-                            <td>{{ status }}</td>
-                            <td><a href="{{ services[name] }}" target="_blank">{{ name }}</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <!-- Sub-menu for Settings -->
+            <div class="row mb-3">
+                <div class="col d-flex justify-content-between">
+                    <button onclick="showSettingsSection('service_status')" class="btn btn-secondary">Servers</button>
+                    <button onclick="showSettingsSection('rule_management')" class="btn btn-secondary">Rules</button>
+                </div>
             </div>
 
-            <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
-                <div class="form-group">
-                    <label for="rule_name">Select Rule:</label>
-                    <select id="rule_name" name="rule_name" class="form-control" onchange="toggleNewRuleName()">
-                        {% for rule_name in config['rules'].keys() %}
-                        <option value="{{ rule_name }}" {{ 'selected' if rule_name == rule else '' }}>{{ rule_name|capitalize }}</option>
-                        {% endfor %}
-                        <option value="add_new">Add New</option>
-                    </select>
+            <!-- Service Status and Site Links Subsection -->
+            <div id="service_status" class="settings-subsection">
+                <h4>Servers</h4>
+                <div class="service-status mb-4" style="font-size: 0.8rem;">
+                    <table class="table table-dark table-striped">
+                        <tbody>
+                            {% for name, status in service_status.items() %}
+                            <tr>
+                                <td>{{ name }}</td>
+                                <td>{{ status }}</td>
+                                <td><a href="{{ services[name] }}" target="_blank">{{ name }}</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="form-group" id="new_rule_name_group" style="display:none;">
-                    <label for="new_rule_name">New Rule Name:</label>
-                    <input type="text" id="new_rule_name" name="new_rule_name" class="form-control" placeholder="Enter new rule name">
-                </div>
-                <div class="form-group">
-                    <label for="get_option">How many more episodes to get?:</label>
-                    <input type="text" id="get_option" name="get_option" placeholder="Enter 'season', 'all', or a number" class="form-control" value="">
-                </div>
-                <div class="form-group">
-                    <label for="action_option">Action for Episodes:</label>
-                    <select id="action_option" name="action_option" class="form-control">
-                        <option value="monitor">Monitor</option>
-                        <option value="search">Search</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="keep_watched">How many episodes to keep?:</label>
-                    <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'season', 'all', or a number" class="form-control" value="">
-                </div>
-                <div class="form-group">
-                    <label for="monitor_watched">Keep monitored if watched:</label>
-                    <select id="monitor_watched" name="monitor_watched" class="form-control">
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Update Settings</button>
-            </form>
-            
-            <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}" onsubmit="return confirmDeleteRule()">
-                <input type="hidden" name="rule_name" id="delete_rule_name">
-                <button type="submit" class="btn btn-danger" id="delete_rule">Delete Rule</button>
-            </form>
-            
-            <button class="btn btn-secondary" id="assign-rules-button" onclick="showSection('assign_rules', document.getElementById('rule_name').value)">Assign Rules</button>
+            </div>
+
+            <!-- Rule Management Subsection -->
+            <div id="rule_management" class="settings-subsection" style="display: none;">
+                <h4>Rules</h4>
+                <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
+                    <div class="form-group">
+                        <label for="rule_name">Select Rule:</label>
+                        <select id="rule_name" name="rule_name" class="form-control" onchange="toggleNewRuleName()">
+                            {% for rule_name in config['rules'].keys() %}
+                            <option value="{{ rule_name }}" {{ 'selected' if rule_name == rule else '' }}>{{ rule_name|capitalize }}</option>
+                            {% endfor %}
+                            <option value="add_new">Add New</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="new_rule_name_group" style="display:none;">
+                        <label for="new_rule_name">New Rule Name:</label>
+                        <input type="text" id="new_rule_name" name="new_rule_name" class="form-control" placeholder="Enter new rule name">
+                    </div>
+                    <div class="form-group">
+                        <label for="get_option">How many more episodes to get?:</label>
+                        <input type="text" id="get_option" name="get_option" placeholder="Enter 'season', 'all', or a number" class="form-control" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="action_option">Action for Episodes:</label>
+                        <select id="action_option" name="action_option" class="form-control">
+                            <option value="monitor">Monitor</option>
+                            <option value="search">Search</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="keep_watched">How many episodes to keep?:</label>
+                        <input type="text" id="keep_watched" name="keep_watched" placeholder="Enter 'season', 'all', or a number" class="form-control" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="monitor_watched">Keep monitored if watched:</label>
+                        <select id="monitor_watched" name="monitor_watched" class="form-control">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Settings</button>
+                </form>
+
+                <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}" onsubmit="return confirmDeleteRule()">
+                    <input type="hidden" name="rule_name" id="delete_rule_name">
+                    <button type="submit" class="btn btn-danger" id="delete_rule">Delete Rule</button>
+                </form>
+
+                <!-- Assign Rules Button -->
+                <button class="btn btn-secondary mt-3" onclick="showSection('assign_rules')">Assign Rules</button>
+            </div>
         </div>
-        
+
+        <!-- Assign Rules Section -->
         <div id="assign_rules" style="display: none;">
             <h3>Assign/Unassign Rules to Series</h3>
             <form id="assign-rules-form" method="POST" action="{{ url_for('assign_rules') }}">
@@ -155,7 +160,7 @@
                 <span class="disclaimer">(will override current assignments)</span>
             </form>
         </div>
-        
+
         <script type="application/json" id="config-data">{{ config|tojson|safe }}</script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
     </div>

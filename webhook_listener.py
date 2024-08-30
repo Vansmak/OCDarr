@@ -37,7 +37,12 @@ services = {
     "Sonarr": "http://192.168.254.205:8989",
     "Radarr": "http://192.168.254.205:7878",
     "Tautulli": "http://192.168.254.205:8181",
-    "SABnzbd": "http://sab.home"
+    "SABnzbd": "http://192.168.254.205:8080",
+    "Prowlarr": "http://192.168.254.205:9696",
+    "Overseer": "http://192.168.254.205:5055",
+    "Readarr": "http://192.168.254.205:8787",
+    "Calibre": "http://192.168.254.205:8883",
+    "Home Assistant": "http://192.168.254.64:8123"
 }
 
 # Configuration management

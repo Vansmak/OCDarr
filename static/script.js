@@ -46,6 +46,10 @@ function showSection(sectionId, ruleName) {
     document.querySelector(`.menu span[onclick="showSection('${sectionId}')"]`)?.classList.add('active');
     document.querySelector(`.menu img[onclick="showSection('${sectionId}')"]`)?.classList.add('active');
 
+    if (sectionId === 'settings') {
+        showSettingsSection('service_status'); // Default to Servers subsection
+    }
+
     if (sectionId === 'assign_rules') {
         document.getElementById('series_list').style.display = 'block';
         if (ruleName) {
@@ -53,6 +57,13 @@ function showSection(sectionId, ruleName) {
         }
         updateCheckboxes();
     }
+}
+
+function showSettingsSection(subsectionId) {
+    document.querySelectorAll('.settings-subsection').forEach(subsection => {
+        subsection.style.display = 'none';
+    });
+    document.getElementById(subsectionId).style.display = 'block';
 }
 
 function loadRule() {
@@ -69,11 +80,9 @@ function loadRule() {
 
 function updateCheckboxes() {
     var selectedRule = document.getElementById('assign_rule_name').value;
-    
     var checkboxes = Array.from(document.querySelectorAll('.series-checkbox'));
-    
     var seriesContainer = document.getElementById('series_list');
-    
+
     // Clear the series container
     seriesContainer.innerHTML = '';
 
@@ -184,4 +193,3 @@ function confirmDeleteRule() {
     document.getElementById('delete_rule_name').value = ruleName;
     return confirm(`Are you sure you want to delete the rule "${ruleName}"?`);
 }
-

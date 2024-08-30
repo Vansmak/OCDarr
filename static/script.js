@@ -185,36 +185,3 @@ function confirmDeleteRule() {
     return confirm(`Are you sure you want to delete the rule "${ruleName}"?`);
 }
 
-function triggerWake() {
-    fetch('/trigger-wake', {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Wake command sent successfully.');
-        } else {
-            alert('Failed to send wake command.');
-        }
-    })
-    .catch(error => {
-        alert('Failed to send wake command.');
-    });
-}
-
-function refreshPlex() {
-    fetch('/refresh-plex', {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Plex refresh command sent successfully.');
-        } else {
-            alert('Failed to send Plex refresh command.');
-        }
-    })
-    .catch(error => {
-        alert('Failed to send Plex refresh command.');
-    });
-}

@@ -152,9 +152,9 @@ Each rule has these four options
 
 ** Making and assigning rules
 
-      A show can only have one rule at a time.  If you select a new rule for a show it will reassign it. If you want to remove a show from a rule so it has none then select none and check that show.
+      A show can only have one rule at a time.  I no rule is assigned then it will use the default rule.  Make sure you change the default rule to your preference.  If you select a new rule for a show it will reassign it. 
       Name them however it makes sense to you.
-      !important: If you do not assign a show to a rule it will not process that show at all, it will be treated solely by your sonarr settings.
+      !important: If you do not assign a show to a rule it will use the default rule.
 
 Additional Notes
 

@@ -33,30 +33,46 @@ app.logger.addHandler(stream_handler)
 config_path = os.path.join(app.root_path, 'config', 'config.json')
 
 def load_config():
+    config_path = os.getenv('CONFIG_PATH', '/app/config/config.json')
     try:
         with open(config_path, 'r') as file:
             config = json.load(file)
         if 'rules' not in config:
             config['rules'] = {}
-        return config
-    except FileNotFoundError:
-        default_config = {
-            'rules': {
-                'full_seasons': {
+
+        # Only add default rule if it doesn't exist in the config
+        if 'default_rule' not in config:
+            config['default_rule'] = 'default'
+            if 'default' not in config['rules']:
+                config['rules']['default'] = {
                     'get_option': 'season',
                     'action_option': 'monitor',
                     'keep_watched': 'season',
-                    'monitor_watched': False,
-                    'series': [ ]
+                    'monitor_watched': True,
+                    'series': []
                 }
-            }
+        return config
+    except FileNotFoundError:
+        # Default config structure for first-time users or missing config
+        return {
+            'rules': {
+                'default': {
+                    'get_option': 'season',
+                    'action_option': 'monitor',
+                    'keep_watched': 'season',
+                    'monitor_watched': True,
+                    'series': []
+                }
+            },
+            'default_rule': 'default'
         }
-        save_config(default_config)
-        return default_config
 
 def save_config(config):
+    config_path = os.getenv('CONFIG_PATH', '/app/config/config.json')
     with open(config_path, 'w') as file:
         json.dump(config, file, indent=4)
+
+
 
 def normalize_name(name):
     return ' '.join(word.capitalize() for word in name.replace('_', ' ').split())
@@ -82,9 +98,10 @@ def home():
     # Build a dictionary that maps series IDs to their assigned rules
     rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() for series_id in details.get('series', [])}
 
-    # Annotate each series with its assigned rule or 'None'
+    # Annotate each series with its assigned rule or default rule
+    default_rule = config.get('default_rule', 'default')
     for series in all_series:
-        series['assigned_rule'] = rules_mapping.get(str(series['id']), 'None')
+        series['assigned_rule'] = rules_mapping.get(str(series['id']), default_rule)
 
     missing_log_content = get_missing_log_content()  # Fetch the missing log content here
 
@@ -114,9 +131,15 @@ def update_settings():
         'monitor_watched': request.form.get('monitor_watched', 'false').lower() == 'true',
         'series': config['rules'].get(rule_name, {}).get('series', [])
     }
-    
+
+    # Set this rule as default if the checkbox is checked
+    if request.form.get('default_rule'):
+        config['default_rule'] = rule_name
+
     save_config(config)
     return redirect(url_for('home', section='settings', message="Settings updated successfully"))
+
+
 
 @app.route('/delete_rule', methods=['POST'])
 def delete_rule():
@@ -135,8 +158,8 @@ def assign_rules():
     rule_name = request.form.get('assign_rule_name')
     submitted_series_ids = set(request.form.getlist('series_ids'))
 
-    if rule_name == 'None':
-        # Remove series from any rule
+    if not rule_name or rule_name == 'remove':
+        # If no rule is selected or it's explicitly marked to remove rules, unassign series from all rules
         for key, details in config['rules'].items():
             details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
     else:
@@ -146,10 +169,10 @@ def assign_rules():
             updated_series = current_series.union(submitted_series_ids)
             config['rules'][rule_name]['series'] = list(updated_series)
 
-        # Update other rules to remove the series if it's no longer assigned there
+        # Remove the series from any other rules
         for key, details in config['rules'].items():
             if key != rule_name:
-                # Preserve series not submitted in other rules
+                # Remove series IDs from other rules
                 details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
 
     save_config(config)

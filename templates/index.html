@@ -109,6 +109,8 @@
                 <button type="submit" class="btn btn-primary">Update Settings</button>
             </form>
             
+            
+            
             <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}" onsubmit="return confirmDeleteRule()">
                 <input type="hidden" name="rule_name" id="delete_rule_name">
                 <button type="submit" class="btn btn-danger" id="delete_rule">Delete Rule</button>

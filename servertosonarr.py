@@ -228,19 +228,28 @@ def process_episodes_based_on_rules(series_id, season_number, episode_number, ru
 
 def main():
     series_name, season_number, episode_number = get_server_activity()
+    
     if series_name:
         series_id = get_series_id(series_name)
+        
         if series_id:
+            # Look for a specific rule for the series
             rule = next((details for key, details in config['rules'].items() if str(series_id) in details.get('series', [])), None)
+            
+            # If no specific rule is found, use the default rule
+            if not rule:
+                rule = config.get('rules', {}).get(config.get('default_rule'))
+                logger.info(f"No specific rule found for series ID {series_id}. Applying default rule: {rule}")
+
             if rule:
-                logger.info(f"Applying rule: {rule}")
                 process_episodes_based_on_rules(series_id, season_number, episode_number, rule)
             else:
-                logger.info(f"No rule found for series ID {series_id}. Skipping operations.")
+                logger.warning(f"No rule or default rule found for series ID {series_id}. Skipping operations.")
         else:
             logger.error(f"Series ID not found for series: {series_name}")
     else:
         logger.error("No server activity found.")
+
 
 if __name__ == "__main__":
     main()

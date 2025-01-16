@@ -41,4 +41,4 @@ RUN mkdir -p /app/logs
 EXPOSE 5001
 
 # Use Gunicorn to serve the application
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5002", "webhook_listener:app"]
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5001", "webhook_listener:app"]

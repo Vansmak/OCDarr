@@ -19,6 +19,6 @@ services:
       - ./config:/app/config
       - ./temp:/app/temp
     ports:
-      - "5002:5002"
+      - "5001:5001"
     restart: unless-stopped
 

@@ -1,21 +1,24 @@
 version: '3.8'
 services:
   sonarr_script:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - SERVER_TYPE
-      - SERVER_URL
-      - SERVER_TOKEN
-      - SONARR_URL
-      - SONARR_API_KEY
-      - WATCHED_PERCENT
-      - GET_OPTION
-      - ACTION_OPTION
-      - ALREADY_WATCHED
+      
+      SONARR_URL: ${SONARR_URL?Variable not set}
+      SONARR_API_KEY: ${SONARR_API_KEY?Variable not set}
+      CONFIG_PATH: /app/config/config.json
+      
+    env_file:
+      - .env
+
     volumes:
       - .:/app
       - ./logs:/app/logs
+      - ./config:/app/config
+      - ./temp:/app/temp
     ports:
-      - "5001:5001"
+      - "5002:5002"
     restart: unless-stopped
 

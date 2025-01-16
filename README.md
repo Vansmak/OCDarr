@@ -19,7 +19,12 @@ OCDarr automates TV show maintenance in Sonarr based on Plex viewing activity vi
 
 ![ocdarr_dev](https://github.com/Vansmak/OCDarr/assets/16037573/5491d694-2e9a-46fb-a1f8-539dcaf661df)
 
-the mobile branch uses a banner for artwork that I like better on mobile devuces. 
+the mobile branch uses a banner for artwork that I like better on mobile devices. 
+
+![Screenshot_20250116-124543 2](https://github.com/user-attachments/assets/06ec8021-e786-4c20-8c49-56e6d76b51da)
+
+
+
 
 ## Installation
 Either:

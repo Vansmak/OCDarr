@@ -6,6 +6,10 @@ If you find this project helpful, please consider supporting it. Your contributi
 OCDarr automates TV show maintenance in Sonarr based on Plex viewing activity via Tautulli. It ensures that the next episode is ready and cleans up watched episodes based on user-defined preferences. Ideal for keeping your media server tidy and your series up-to-date without manual intervention. Not useful for hoarders.  For example, sometimes I start an old show and never finish it, or takes awhile before I really get into it. So This way I dont have full seasons sitting there. I also do not have other users outside my household and am not a rewatcher of tv so I like to delete after a show is watched. This will always have the next episode ready to go and the last episode watched saved just in case.  If I need to protect a show because someone else is behind me then I can set certain shows to not delete.  If someone prefers getting full season instead of one episode you can do that. For example, if you have a new shows pilot episode only, once its watched the script can then monitor the rest of the season. Keep or delete previous episodes.  
 
 ## Features
+******only in dev branch****
+-** added a client only mode for just showing recent episodes and premiers without any episode management CLIENT_ONLY=true
+-**added choice between poster or banner artwork USE_POSTERS=true or false
+*****************************
 - ** ADDED RULE_SETS, see below**
 - **Dockerized**: Easy to deploy and manage as a Docker container.
     https://hub.docker.com/r/vansmak/ocdarr 
@@ -19,7 +23,7 @@ OCDarr automates TV show maintenance in Sonarr based on Plex viewing activity vi
 
 ![ocdarr_dev](https://github.com/Vansmak/OCDarr/assets/16037573/5491d694-2e9a-46fb-a1f8-539dcaf661df)
 
-foar a different look using banners, better on mobile try the mobile branch https://github.com/Vansmak/OCDarr/tree/mobile
+for a different look using banners, better on mobile try the dev branch https://github.com/Vansmak/OCDarr/tree/dev
 
 ## Installation
 Either:
@@ -34,7 +38,7 @@ cd OCDarr
  After cloning the repository, switch to the main branch:
 ```
    cd OCDarr
-   git checkout main
+   git checkout main or dev(recommended)
 ```
 Configuration
 Environment Setup
@@ -47,10 +51,12 @@ cp .env.example .env
 nano .env  # use your preferred text editor
 ```
 Fill in the environment variables:
-  
-  SONARR_URL: URL to your Sonarr server.
-  SONARR_API_KEY: Your Sonarr API key.
-  
+``` 
+SONARR_URL: URL to your Sonarr server.
+SONARR_API_KEY: Your Sonarr API key.
+USE_POSTERS=true
+CLIENT_ONLY=true
+```
 Docker Compose
 
 Edit the docker-compose.yml file to suit your setup. Make sure the .env file is referenced correctly, and ports are mapped to your preference:
@@ -92,7 +98,7 @@ This command builds the Docker image and runs it in detached mode.
 OR:
 
 ### Docker hub https://hub.docker.com/r/vansmak/ocdarr
-
+(no dev branch on docker hub yet)
 Docker Instructions
 
    Pull the Docker Image
@@ -123,6 +129,7 @@ Docker Instructions
 
 ```
 ###Usage
+****only for client_only=false
 Once your Docker container is running, it will listen for webhook calls from Tautulli when an episode is deemed as watched. Configure Tautulli to send webhooks to http://<docker-host-ip>:5001
 
 ![webhook](https://github.com/Vansmak/OCDarr/assets/16037573/cf0db503-d730-4a9c-b83e-2d21a3430ece)![webhook2](https://github.com/Vansmak/OCDarr/assets/16037573/45be66c2-1869-49c1-8074-9081ed7c913b)
@@ -162,8 +169,9 @@ Each rule has these four options
 
 Additional Notes
 
-  Set watched criteria in Tautulli general settings. (consider % watched before webhook is sent)
-   
+  Set watched criteria in Tautulli general settings. 
+  (consider % watched before webhook is sent)
+****end client_only=false setup   
 Troubleshooting
 
 If you encounter issues, check the Docker container logs and logs/app.log and ensure all environment variables are correctly set.

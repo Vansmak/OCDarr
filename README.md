@@ -1,6 +1,7 @@
 #  <img src="https://github.com/Vansmak/OCDarr/assets/16037573/f802fece-e884-4282-8eb5-8c07aac1fd16" alt="logo" width="200"/>
 
-please use Main branch (https://github.com/Vansmak/OCDarr/blob/main/README.md)
+Support This Project
+If you find this project helpful, please consider supporting it. Your contributions help maintain and improve the project. Any support is greatly appreciated! ❤️ https://buymeacoffee.com/vansmak Thank you for your support!
 
 OCDarr automates TV show maintenance in Sonarr based on Plex viewing activity via Tautulli. It ensures that the next episode is ready and cleans up watched episodes based on user-defined preferences. Ideal for keeping your media server tidy and your series up-to-date without manual intervention. Not useful for hoarders.  For example, sometimes I start an old show and never finish it, or takes awhile before I really get into it. So This way I dont have full seasons sitting there. I also do not have other users outside my household and am not a rewatcher of tv so I like to delete after a show is watched. This will always have the next episode ready to go and the last episode watched saved just in case.  If I need to protect a show because someone else is behind me then I can set certain shows to not delete.  If someone prefers getting full season instead of one episode you can do that. For example, if you have a new shows pilot episode only, once its watched the script can then monitor the rest of the season. Keep or delete previous episodes.  
 
@@ -28,10 +29,10 @@ Start by cloning the repository and navigating into the directory:
 git clone https://github.com/Vansmak/OCDarr.git
 cd OCDarr
 ```
- After cloning the repository, switch to the dev branch:
+ After cloning the repository, switch to the main branch:
 ```
    cd OCDarr
-   git checkout dev
+   git checkout main
 ```
 Configuration
 Environment Setup
@@ -94,7 +95,7 @@ Docker Instructions
 
    Pull the Docker Image
 ```
-    docker pull vansmak/ocdarr_dev:arch64 amd64
+    docker pull vansmak/ocdarr:arch64 or amd64
 ```
   
 
@@ -109,15 +110,14 @@ Docker Instructions
   Run the Docker Container
 ```
     docker run -d \
-      --env-file=.env \
+      --env-file .env \
       --env CONFIG_PATH=/app/config/config.json \
       -p 5001:5001 \
-      -v $(pwd):/app \
-      -v $(pwd)/logs:/app/logs \
-      -v $(pwd)/config:/app/config \
-      -v $(pwd)/temp:/app/temp \
+      -v ${PWD}/logs:/app/logs \
+      -v ${PWD}/config:/app/config \
+      -v ${PWD}/temp:/app/temp \
       --restart unless-stopped \
-      vansmak/ocdarr:tagname
+      vansmak/ocdarr:amd64,arm64
 
 ```
 ###Usage
@@ -154,9 +154,9 @@ Each rule has these four options
 
 ** Making and assigning rules
 
-      A show can only have one rule at a time.  If you select a new rule for a show it will reassign it. If you want to remove a show from a rule so it has none then select none and check that show.
+      A show can only have one rule at a time.  I no rule is assigned then it will use the default rule.  Make sure you change the default rule to your preference.  If you select a new rule for a show it will reassign it. 
       Name them however it makes sense to you.
-      !important: If you do not assign a show to a rule it will not process that show at all, it will be treated solely by your sonarr settings.
+      !important: If you do not assign a show to a rule it will use the default rule.
 
 Additional Notes
 

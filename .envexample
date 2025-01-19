@@ -1,5 +1,7 @@
 SONARR_URL=http://localhost:8989
 SONARR_API_KEY=YOUR_SONARR_API_KEY_HERE 
+USE_POSTERS=false
+CLIENT_ONLY=true
 LOG_PATH=/app/logs/app.log
 MISSING_LOG_PATH=/app/logs/missing.log
 

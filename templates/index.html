@@ -27,19 +27,19 @@
             <span onclick="showSection('current')" class="menu-icon active">
                 Watching
             </span>
-            <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="Settings" class="logo-icon" onclick="showSection('settings')">
+            {% if not config.get('CLIENT_ONLY') %} <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="Settings" class="logo-icon" onclick="showSection('settings')"> {% endif %}
             <span onclick="showSection('upcoming')" class="menu-icon">
                 Premiering
             </span>
         </div>
 
         <div id="current" class="series-container">
-            <div class="row">
+            <div class="row {% if use_posters %}poster-mode{% else %}banner-mode{% endif %}">
                 {% for series in current_series %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
-                    <div class="poster-wrapper">
+                <div class="col-12 {% if use_posters %}col-md-6 col-lg-4 col-xl-3{% endif %} series-item {% if use_posters %}poster-mode{% else %}banner-mode{% endif %}">
+                    <div class="banner-wrapper {% if use_posters %}poster-mode{% else %}banner-mode{% endif %}">
                         <a href="{{ series.sonarr_series_url }}">
-                            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid poster">
+                            <img src="{{ series.artwork_url }}" alt="Artwork for {{ series.name }}" class="img-fluid">
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
@@ -49,26 +49,26 @@
                 {% endfor %}
             </div>
         </div>
-
-        <div id="upcoming" class="series-container" style="display: none;">
-            <div class="row">
+        
+        <div id="upcoming" class="series-container"> 
+            <div class="row {% if use_posters %}poster-mode{% else %}banner-mode{% endif %}">
                 {% for premiere in upcoming_premieres %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 series-item mb-2">
-                    <div class="poster-wrapper">
+                <div class="col-12 {% if use_posters %}col-md-6 col-lg-4 col-xl-3{% endif %} series-item {% if use_posters %}poster-mode{% else %}banner-mode{% endif %}">
+                    <div class="banner-wrapper {% if use_posters %}poster-mode{% else %}banner-mode{% endif %}">
                         <a href="{{ premiere.sonarr_series_url }}">
-                            <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid poster">
+                            <img src="{{ premiere.artwork_url }}" alt="Artwork for {{ premiere.name }}" class="img-fluid">
                         </a>
                     </div>
                     <div class="series-info text-center mt-1">
                         <p class="series-title">{{ premiere.name }}</p>
-                        <p class="episode-info">{{ premiere.nextAiring.split(' at ')[0] }}</p>
+                        <p class="episode-info">{{ premiere.nextAiring.split('at')[0] }}</p>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <div id="settings" style="display: none;">
+        {% if not config.get('CLIENT_ONLY') %} <div id="settings" style="display: none;">
             <form id="settings-form" method="POST" action="{{ url_for('update_settings') }}">
                 <h3>Manage Settings</h3>
                 <div class="form-group">
@@ -108,6 +108,8 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Update Settings</button>
             </form>
+            
+            
             
             <form id="delete-rule-form" method="POST" action="{{ url_for('delete_rule') }}" onsubmit="return confirmDeleteRule()">
                 <input type="hidden" name="rule_name" id="delete_rule_name">
@@ -154,7 +156,7 @@
         
             
         </div>
-        
+        {% endif %}
         
         <script type="application/json" id="config-data">{{ config|tojson|safe }}</script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>

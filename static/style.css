@@ -148,10 +148,17 @@ body::-webkit-scrollbar,
 
 /* Poster Mode Specific Styles */
 .poster-mode.series-item {
-    background: rgba(0, 0, 0, 0.5);
     padding: 0;
     margin: 10px;
     width: fit-content;
+}
+
+/* Row styles for poster grid */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px;
+    width: calc(100% + 20px);
 }
 
 /* Responsive Layout */
@@ -174,7 +181,7 @@ body::-webkit-scrollbar,
         align-items: stretch;
         margin: 10px;
         padding: 0;
-        
+        background: rgba(0, 0, 0, 0.5);
     }
 
     .poster-mode .banner-wrapper {
@@ -211,6 +218,11 @@ body::-webkit-scrollbar,
         max-width: 50%;
     }
     
+    .poster-mode .col-12 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
     .banner-wrapper.poster-mode {
         max-width: 150px;
     }
@@ -221,5 +233,21 @@ body::-webkit-scrollbar,
     .banner-mode .col-12 {
         flex: 0 0 33.333%;
         max-width: 33.333%;
+    }
+    
+    /* Updated poster layout for desktop */
+    .poster-mode .col-12 {
+        flex: 0 0 25%;
+        max-width: 25%;
+        padding: 10px;
+    }
+    
+    .poster-mode.series-item {
+        margin: 0;
+        width: 100%;
+    }
+    
+    .banner-wrapper.poster-mode {
+        max-width: 100%;
     }
 }

@@ -39,7 +39,7 @@ def fetch_episode_file_details(episode_file_id):
 def fetch_series_and_episodes(preferences):
     SONARR_URL = preferences['SONARR_URL']
     SONARR_API_KEY = preferences['SONARR_API_KEY']
-    USE_POSTERS = os.getenv('USE_POSTERS', 'false').lower() == 'true'
+    
     series_url = f"{SONARR_URL}/api/v3/series"
     headers = {'X-Api-Key': SONARR_API_KEY}
     active_series = []
@@ -62,7 +62,7 @@ def fetch_series_and_episodes(preferences):
                     active_series.append({
                         'name': series['title'],
                         'latest_monitored_episode': f"S{episode['seasonNumber']}E{episode['episodeNumber']} - {episode['title']}",
-                        'artwork_url': f"{SONARR_URL}/api/v3/mediacover/{series['id']}/{'poster' if USE_POSTERS else 'banner'}.jpg?apikey={SONARR_API_KEY}",
+                        'artwork_url': f"{SONARR_URL}/api/v3/mediacover/{series['id']}/banner.jpg?apikey={SONARR_API_KEY}",
                         'sonarr_series_url': f"{SONARR_URL}/series/{series['titleSlug']}",
                         'dateAdded': date_added
                     })
@@ -76,7 +76,7 @@ def fetch_series_and_episodes(preferences):
 def fetch_upcoming_premieres(preferences):
     SONARR_URL = preferences['SONARR_URL']
     SONARR_API_KEY = preferences['SONARR_API_KEY']
-    USE_POSTERS = os.getenv('USE_POSTERS', 'false').lower() == 'true' 
+    
     series_url = f"{SONARR_URL}/api/v3/series"
     headers = {'X-Api-Key': SONARR_API_KEY}
     upcoming_premieres = []
@@ -91,7 +91,7 @@ def fetch_upcoming_premieres(preferences):
                 upcoming_premieres.append({
                     'name': series['title'],
                     'nextAiring': formatted_date,
-                    'artwork_url': f"{SONARR_URL}/api/v3/mediacover/{series['id']}/{'poster' if USE_POSTERS else 'banner'}.jpg?apikey={SONARR_API_KEY}",  # Update this line
+                    'artwork_url': f"{SONARR_URL}/api/v3/mediacover/{series['id']}/banner.jpg?apikey={SONARR_API_KEY}",
                     'sonarr_series_url': f"{SONARR_URL}/series/{series['titleSlug']}"
                 })
 

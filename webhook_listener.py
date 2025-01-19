@@ -16,6 +16,7 @@ load_dotenv()
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 MISSING_LOG_PATH = os.getenv('MISSING_LOG_PATH', '/app/logs/missing.log')
+CLIENT_ONLY = os.getenv('CLIENT_ONLY', 'false').lower() == 'true'
 
 # Setup logging to capture all logs
 logging.basicConfig(filename=os.getenv('LOG_PATH', '/app/logs/app.log'), 
@@ -29,37 +30,43 @@ formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 stream_handler.setFormatter(formatter)
 app.logger.addHandler(stream_handler)
 
-# Configuration management
-config_path = os.path.join(app.root_path, 'config', 'config.json')
-
 def load_config():
+    config_path = os.getenv('CONFIG_PATH', '/app/config/config.json')
     try:
         with open(config_path, 'r') as file:
             config = json.load(file)
         if 'rules' not in config:
             config['rules'] = {}
-        return config
-    except FileNotFoundError:
-        default_config = {
-            'rules': {
-                'full_seasons': {
+
+        if 'default_rule' not in config:
+            config['default_rule'] = 'default'
+            if 'default' not in config['rules']:
+                config['rules']['default'] = {
                     'get_option': 'season',
                     'action_option': 'monitor',
                     'keep_watched': 'season',
-                    'monitor_watched': False,
-                    'series': ['series_id1', 'series_id2']
+                    'monitor_watched': True,
+                    'series': []
                 }
-            }
+        return config
+    except FileNotFoundError:
+        return {
+            'rules': {
+                'default': {
+                    'get_option': 'season',
+                    'action_option': 'monitor',
+                    'keep_watched': 'season',
+                    'monitor_watched': True,
+                    'series': []
+                }
+            },
+            'default_rule': 'default'
         }
-        save_config(default_config)
-        return default_config
 
 def save_config(config):
+    config_path = os.getenv('CONFIG_PATH', '/app/config/config.json')
     with open(config_path, 'w') as file:
         json.dump(config, file, indent=4)
-
-def normalize_name(name):
-    return ' '.join(word.capitalize() for word in name.replace('_', ' ').split())
 
 def get_missing_log_content():
     try:
@@ -73,106 +80,111 @@ def get_missing_log_content():
 
 @app.route('/')
 def home():
-    config = load_config()
     preferences = sonarr_utils.load_preferences()
     current_series = sonarr_utils.fetch_series_and_episodes(preferences)
     upcoming_premieres = sonarr_utils.fetch_upcoming_premieres(preferences)
-    all_series = sonarr_utils.get_series_list(preferences)  # Ensure this function fetches series info
+    use_posters = os.getenv('USE_POSTERS', 'false').lower() == 'true'
+
+    if CLIENT_ONLY:
+        return render_template('index.html',
+                             current_series=current_series,
+                             upcoming_premieres=upcoming_premieres,
+                             use_posters=use_posters,
+                             sonarr_url=SONARR_URL,
+                             config={'CLIENT_ONLY': CLIENT_ONLY})
+
+    # Full functionality for non-client mode
+    config = load_config()
+    all_series = sonarr_utils.get_series_list(preferences)
+    rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() 
+                    for series_id in details.get('series', [])}
     
-    # Build a dictionary that maps series IDs to their assigned rules
-    rules_mapping = {str(series_id): rule_name for rule_name, details in config['rules'].items() for series_id in details.get('series', [])}
-
-    # Annotate each series with its assigned rule or 'None'
+    default_rule = config.get('default_rule', 'default')
     for series in all_series:
-        series['assigned_rule'] = rules_mapping.get(str(series['id']), 'None')
+        series['assigned_rule'] = rules_mapping.get(str(series['id']), default_rule)
 
-    missing_log_content = get_missing_log_content()  # Fetch the missing log content here
+    missing_log_content = get_missing_log_content()
+    rule = request.args.get('rule', 'full_seasons')
 
-    rule = request.args.get('rule', 'full_seasons')  # Get the rule parameter from the request
-
-    return render_template('index.html', config=config, current_series=current_series, 
-                           upcoming_premieres=upcoming_premieres, all_series=all_series, 
-                           sonarr_url=SONARR_URL, missing_log=missing_log_content, rule=rule)
+    return render_template('index.html',
+                         config=config,
+                         current_series=current_series,
+                         upcoming_premieres=upcoming_premieres,
+                         all_series=all_series,
+                         sonarr_url=SONARR_URL,
+                         missing_log=missing_log_content,
+                         rule=rule,
+                         use_posters=use_posters)
 
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
+    if CLIENT_ONLY:
+        return jsonify({'status': 'error', 'message': 'Settings disabled in client mode'}), 400
+        
     config = load_config()
-    
     rule_name = request.form.get('rule_name')
     if rule_name == 'add_new':
         rule_name = request.form.get('new_rule_name')
         if not rule_name:
             return redirect(url_for('home', section='settings', message="New rule name is required."))
-    
-    get_option = request.form.get('get_option')
-    keep_watched = request.form.get('keep_watched')
 
     config['rules'][rule_name] = {
-        'get_option': get_option,
+        'get_option': request.form.get('get_option'),
         'action_option': request.form.get('action_option'),
-        'keep_watched': keep_watched,
+        'keep_watched': request.form.get('keep_watched'),
         'monitor_watched': request.form.get('monitor_watched', 'false').lower() == 'true',
         'series': config['rules'].get(rule_name, {}).get('series', [])
     }
-    
+
+    if request.form.get('default_rule'):
+        config['default_rule'] = rule_name
+
     save_config(config)
     return redirect(url_for('home', section='settings', message="Settings updated successfully"))
 
 @app.route('/delete_rule', methods=['POST'])
 def delete_rule():
+    if CLIENT_ONLY:
+        return jsonify({'status': 'error', 'message': 'Rule deletion disabled in client mode'}), 400
+        
     config = load_config()
     rule_name = request.form.get('rule_name')
     if rule_name and rule_name in config['rules']:
         del config['rules'][rule_name]
         save_config(config)
         return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' deleted successfully."))
-    else:
-        return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' not found."))
+    return redirect(url_for('home', section='settings', message=f"Rule '{rule_name}' not found."))
 
 @app.route('/assign_rules', methods=['POST'])
 def assign_rules():
+    if CLIENT_ONLY:
+        return jsonify({'status': 'error', 'message': 'Rule assignment disabled in client mode'}), 400
+        
     config = load_config()
     rule_name = request.form.get('assign_rule_name')
     submitted_series_ids = set(request.form.getlist('series_ids'))
 
-    if rule_name == 'None':
-        # Remove series from any rule
+    if not rule_name or rule_name == 'remove':
         for key, details in config['rules'].items():
             details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
     else:
-        # Update the rule's series list to include only those submitted
         if rule_name in config['rules']:
             current_series = set(config['rules'][rule_name]['series'])
             updated_series = current_series.union(submitted_series_ids)
             config['rules'][rule_name]['series'] = list(updated_series)
 
-        # Update other rules to remove the series if it's no longer assigned there
         for key, details in config['rules'].items():
             if key != rule_name:
-                # Preserve series not submitted in other rules
                 details['series'] = [sid for sid in details.get('series', []) if sid not in submitted_series_ids]
-
-    save_config(config)
-    return redirect(url_for('home', section='settings', message="Rules updated successfully."))
-
-
-@app.route('/unassign_rules', methods=['POST'])
-def unassign_rules():
-    config = load_config()
-    rule_name = request.form.get('assign_rule_name')
-    submitted_series_ids = set(request.form.getlist('series_ids'))
-
-    # Update the rule's series list to exclude those submitted
-    if rule_name in config['rules']:
-        current_series = set(config['rules'][rule_name]['series'])
-        updated_series = current_series.difference(submitted_series_ids)
-        config['rules'][rule_name]['series'] = list(updated_series)
 
     save_config(config)
     return redirect(url_for('home', section='settings', message="Rules updated successfully."))
 
 @app.route('/webhook', methods=['POST'])
 def handle_server_webhook():
+    if CLIENT_ONLY:
+        return jsonify({'status': 'success', 'message': 'Client only mode - no actions taken'}), 200
+        
     app.logger.info("Received POST request from Tautulli")
     data = request.json
     if data:

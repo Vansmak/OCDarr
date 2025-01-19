@@ -74,9 +74,8 @@ def get_episode_details(series_id, season_number):
 
 def monitor_or_search_episodes(episode_ids, action_option):
     """Either monitor or trigger a search for episodes in Sonarr based on the action_option."""
-    if action_option == "monitor":
-        monitor_episodes(episode_ids, True)
-    elif action_option == "search":
+    monitor_episodes(episode_ids, True)
+    if action_option == "search":
         trigger_episode_search_in_sonarr(episode_ids)
 
 def monitor_episodes(episode_ids, monitor=True):
@@ -190,16 +189,18 @@ def fetch_all_episodes(series_id):
     logger.error("Failed to fetch all episodes.")
     return []
 
-def delete_old_episodes(series_id, keep_episode_ids):
+def delete_old_episodes(series_id, keep_episode_ids, rule):
     """Delete old episodes that are not in the keep list."""
     all_episodes = fetch_all_episodes(series_id)
     episodes_with_files = [ep for ep in all_episodes if ep['hasFile']]
 
-    if config['keep_watched'] == "all":
+    keep_watched = rule.get('keep_watched', 'all')
+
+    if keep_watched == "all":
         logger.info("No episodes to delete as keep_watched is set to 'all'.")
         return
 
-    if config['keep_watched'] == "season":
+    if keep_watched == "season":
         last_watched_season = max(ep['seasonNumber'] for ep in all_episodes if ep['id'] in keep_episode_ids)
         episodes_to_delete = [ep['episodeFileId'] for ep in episodes_with_files if ep['seasonNumber'] < last_watched_season and ep['id'] not in keep_episode_ids]
     else:
@@ -223,22 +224,32 @@ def process_episodes_based_on_rules(series_id, season_number, episode_number, ru
 
     if rule['keep_watched'] != "all":
         keep_episode_ids = next_episode_ids + [last_watched_id]
-        delete_old_episodes(series_id, keep_episode_ids)
+        delete_old_episodes(series_id, keep_episode_ids, rule)
 
 def main():
     series_name, season_number, episode_number = get_server_activity()
+    
     if series_name:
         series_id = get_series_id(series_name)
+        
         if series_id:
+            # Look for a specific rule for the series
             rule = next((details for key, details in config['rules'].items() if str(series_id) in details.get('series', [])), None)
+            
+            # If no specific rule is found, use the default rule
+            if not rule:
+                rule = config.get('rules', {}).get(config.get('default_rule'))
+                logger.info(f"No specific rule found for series ID {series_id}. Applying default rule: {rule}")
+
             if rule:
                 process_episodes_based_on_rules(series_id, season_number, episode_number, rule)
             else:
-                logger.info(f"No rule found for series ID {series_id}. Skipping operations.")
+                logger.warning(f"No rule or default rule found for series ID {series_id}. Skipping operations.")
         else:
             logger.error(f"Series ID not found for series: {series_name}")
     else:
         logger.error("No server activity found.")
+
 
 if __name__ == "__main__":
     main()

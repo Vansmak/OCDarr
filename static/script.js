@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var section = urlParams.get('section');
     var message = urlParams.get('message');
     var rule = urlParams.get('rule');
+    
     if (section) {
         showSection(section, rule);
     }
@@ -13,18 +14,25 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(section).prepend(messageDiv);
     }
 
-    document.getElementById('rule_name').addEventListener('change', function() {
-        var newRuleNameGroup = document.getElementById('new_rule_name_group');
-        if (this.value === 'add_new') {
-            newRuleNameGroup.style.display = 'block';
-        } else {
-            newRuleNameGroup.style.display = 'none';
-        }
-        loadRule();
-    });
+    // Update the checkbox for the default rule on load and when rule changes
+    document.getElementById('rule_name').addEventListener('change', loadRule);
 
     loadRule();
 });
+
+function loadRule() {
+    var ruleName = document.getElementById('rule_name').value;
+    var config = JSON.parse(document.getElementById('config-data').textContent);
+    var rule = config.rules[ruleName];
+
+    document.getElementById('get_option').value = rule ? rule.get_option : '';
+    document.getElementById('action_option').value = rule ? rule.action_option : '';
+    document.getElementById('keep_watched').value = rule ? rule.keep_watched : '';
+    document.getElementById('monitor_watched').value = rule ? rule.monitor_watched.toString() : 'false';
+    
+    // Check if this rule is the default rule
+    document.getElementById('default_rule').checked = config.default_rule === ruleName;
+}
 
 window.addEventListener('DOMContentLoaded', (event) => {
     if (window.location.search.indexOf('message=') >= 0) {

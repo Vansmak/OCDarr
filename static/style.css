@@ -1,35 +1,57 @@
+/* Reset and Base Styles */
 body {
-    background-color: #333; /* Dark grey background */
-    color: #fff;
     margin: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll !important; 
+    color: #fff;
     padding: 0;
     font-family: Arial, sans-serif;
 }
 
+/* Scrollbar Hiding */
+body, 
+.container,
+.series-container,
+.row,
+.settings-subsection,
+.checkbox-list {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+body::-webkit-scrollbar,
+.container::-webkit-scrollbar,
+.series-container::-webkit-scrollbar,
+.row::-webkit-scrollbar,
+.settings-subsection::-webkit-scrollbar,
+.checkbox-list::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Container and Menu Styles */
 .container {
-    padding-left: 10px; 
-    padding-right: 10px; 
-    background: transparent; 
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .menu {
     display: flex;
-    align-items: center; /* Center align the logo and menu items */
-    justify-content: center; /* Center the menu items */
-    margin-bottom: 10px;
-    font-size: 14px;
-    text-align: center;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     background: rgba(0, 0, 0, 0.5);
-    padding: 0px;
+    padding: 5px;
     border-radius: 10px;
+    height: 50px;
 }
 
-.menu span {
+.menu span, .menu img {
     cursor: pointer;
     color: #FFF;
-    padding: 10px 10px; /* Adjust padding for more compact spacing */
-    margin: 0 5px; /* Reduce margin for closer spacing */
+    margin: 0 5px;
     text-decoration: none;
 }
 
@@ -38,154 +60,166 @@ body {
 }
 
 .logo-icon {
-    width: 60px; /* Adjust the size as needed */
+    width: 50px;
     height: auto;
-    margin: 0 10px; /* Center align the logo */
+    flex-shrink: 0;
 }
 
+/* Series Container and Items */
 .series-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin: 0 auto;
-    background: transparent; 
+    display: block;
+    width: 100%;
 }
 
 .series-item {
-    padding: 0;
-    text-align: center;
-    position: relative;
-    margin: 5px;
-    flex: 0 0 calc(33.333% - 10px);
-    background: transparent; 
-}
-
-.poster-wrapper {
-    position: relative;
-    width: 100%;
-    margin: 0 auto;
-}
-
-.poster {
-    width: 100px;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-    margin: 0 auto;
-    background: transparent; 
-}
-
-.series-info {
-    margin-top: 1px;
-    font-size: 12px;
-    line-height: 1.2;
-    background: transparent; 
-}
-
-.episode-number, .episode-title {
-    font-size: 10px;
-    margin-bottom: 1px;
-    word-wrap: break-word;
-}
-
-.premiere-date {
-    font-size: 10px;
-    margin-bottom: 0;
-    margin-top: -10px; /* Adjust this value to move the date up or down */
-}
-
-.alert {
-    color: green;
-    text-align: center;
-}
-
-.form-group {
-    margin: 10px 0;
-}
-
-label {
-    display: block;
-}
-
-input[type="text"], select {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-}
-
-button {
-    width: 100%;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-.btn-link {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    color: black;
-}
-
-.btn-info {
-    background-color: #17a2b8;
-    color: white;
-}
-
-.checkbox-list {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+/* Banner/Poster Wrapper Base Styles */
+.banner-wrapper {
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+}
+
+.banner-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.banner-wrapper img:hover {
+    opacity: 1;
+}
+
+/* Mode Specific Styles */
+.banner-wrapper.banner-mode {
+    aspect-ratio: 25/6;
+}
+
+.banner-wrapper.banner-mode img {
+    object-fit: contain;
+}
+
+.banner-wrapper.poster-mode {
+    aspect-ratio: 2/3;
+    max-width: 300px;
+}
+
+.banner-wrapper.poster-mode img {
+    object-fit: cover;
+}
+
+/* Series Info Styles */
+.series-info {
+    text-align: center;
+    padding: 5px;
+    width: 100%;
+    margin: 5px auto 0;
+}
+
+.series-info .series-title,
+.series-info .episode-info {
+    display: inline-block;
+    margin: 0;
+}
+
+.episode-info {
+    margin: 5px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    width: 100%; /* Ensure it takes up the full width for better alignment */
-}
-
-.checkbox-item input[type="checkbox"] {
-    margin-right: 10px; /* Space between checkbox and label */
-}
-
-.checkbox-item label {
-    margin: 0;
-    white-space: nowrap; /* Prevent wrapping for titles */
-}
-
-.rule-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #444;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-.disclaimer {
+.episode-number, 
+.episode-title, 
+.premiere-date {
     font-size: 12px;
-    color: #ff0000; /* Red color to make the disclaimer stand out */
-    margin-left: 10px;
+    margin: 0 5px;
+    word-wrap: break-word;
+}
+
+/* Poster Mode Specific Styles */
+.poster-mode.series-item {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0;
+    margin: 10px;
+    width: fit-content;
+}
+
+/* Responsive Layout */
+@media (max-width: 767px) {
+    /* Mobile Banner Layout */
+    .banner-mode .col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Mobile Poster Layout */
+    .poster-mode .col-12 {
+        flex: 0 0 100%;
+        max-width: 94%;
+        padding: 2px;
+    }
+
+    .poster-mode.series-item {
+        flex-direction: row;
+        align-items: stretch;
+        margin: 10px;
+        padding: 0;
+        
+    }
+
+    .poster-mode .banner-wrapper {
+        width: 80px;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .poster-mode .banner-wrapper.poster-mode {
+        aspect-ratio: 2/3;
+        max-width: 80px;
+        margin: 0;
+    }
+
+    .poster-mode .series-info {
+        text-align: left;
+        padding-left: 15px;
+        padding-right: 15px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .poster-mode .episode-info {
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 768px) {
+    /* Tablet */
+    .banner-mode .col-12 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
+    .banner-wrapper.poster-mode {
+        max-width: 150px;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Desktop */
+    .banner-mode .col-12 {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
 }

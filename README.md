@@ -23,7 +23,8 @@ OCDarr automates TV show maintenance in Sonarr based on Plex viewing activity vi
 
 ![ocdarr_dev](https://github.com/Vansmak/OCDarr/assets/16037573/5491d694-2e9a-46fb-a1f8-539dcaf661df)
 
-for a different look using banners, better on mobile try the dev branch https://github.com/Vansmak/OCDarr/tree/dev
+for a different look using banners, ![image](https://github.com/user-attachments/assets/7db48f4e-7364-46c5-9c8b-449ddaed4de5)
+
 
 ## Installation
 Either:

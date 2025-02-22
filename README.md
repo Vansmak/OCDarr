@@ -6,8 +6,7 @@ If you find this project helpful, please consider supporting it. Your contributi
 OCDarr automates TV show maintenance in Sonarr based on Plex viewing activity via Tautulli. It ensures that the next episode is ready and cleans up watched episodes based on user-defined preferences. Ideal for keeping your media server tidy and your series up-to-date without manual intervention. Not useful for hoarders.  For example, sometimes I start an old show and never finish it, or takes awhile before I really get into it. So This way I dont have full seasons sitting there. I also do not have other users outside my household and am not a rewatcher of tv so I like to delete after a show is watched. This will always have the next episode ready to go and the last episode watched saved just in case.  If I need to protect a show because someone else is behind me then I can set certain shows to not delete.  If someone prefers getting full season instead of one episode you can do that. For example, if you have a new shows pilot episode only, once its watched the script can then monitor the rest of the season. Keep or delete previous episodes.  
 
 ## Features
-******only in dev branch****
--** added a client only mode for just showing recent episodes and premiers without any episode management CLIENT_ONLY=true
+******NEW, only in dev branch****** added a client only mode for just showing recent episodes and premiers without any episode management CLIENT_ONLY=true
 -**added choice between poster or banner artwork USE_POSTERS=true or false
 *****************************
 - ** ADDED RULE_SETS, see below**

@@ -1,5 +1,6 @@
 #  <img src="https://github.com/Vansmak/OCDarr/assets/16037573/f802fece-e884-4282-8eb5-8c07aac1fd16" alt="logo" width="200"/>
 ******only in dev branch****
+https://github.com/Vansmak/OCDarr/blob/dev/README.md
 added a client only mode for just showing recent episodes and premiers without any episode management CLIENT_ONLY=true
 -**added choice between poster or banner artwork USE_POSTERS=true or false
 *****************************

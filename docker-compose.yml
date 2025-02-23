@@ -1,24 +1,20 @@
 version: '3.8'
 services:
-  sonarr_script:
+  ocdarr:
     build:
       context: .
       dockerfile: Dockerfile
+    image: vansmak/ocdarr:amd64_dev  # New development tag
     environment:
-      
-      SONARR_URL: ${SONARR_URL?Variable not set}
-      SONARR_API_KEY: ${SONARR_API_KEY?Variable not set}
+      SONARR_URL: ${SONARR_URL}
+      SONARR_API_KEY: ${SONARR_API_KEY}
       CONFIG_PATH: /app/config/config.json
-      
     env_file:
       - .env
-
     volumes:
-      - .:/app
       - ./logs:/app/logs
       - ./config:/app/config
       - ./temp:/app/temp
     ports:
       - "5001:5001"
     restart: unless-stopped
-

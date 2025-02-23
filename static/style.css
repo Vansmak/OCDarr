@@ -75,7 +75,7 @@ body::-webkit-scrollbar,
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
     border-radius: 10px;
 }
 
@@ -100,7 +100,7 @@ body::-webkit-scrollbar,
 
 /* Mode Specific Styles */
 .banner-wrapper.banner-mode {
-    aspect-ratio: 25/6;
+    aspect-ratio: 25/4;
 }
 
 .banner-wrapper.banner-mode img {
@@ -119,9 +119,9 @@ body::-webkit-scrollbar,
 /* Series Info Styles */
 .series-info {
     text-align: center;
-    padding: 5px;
+    padding: 2px;
     width: 100%;
-    margin: 5px auto 0;
+    margin: 2px auto 0;
 }
 
 .series-info .series-title,
@@ -131,10 +131,10 @@ body::-webkit-scrollbar,
 }
 
 .episode-info {
-    margin: 5px 0;
+    margin: 2px 0;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 5px;
     flex-wrap: wrap;
 }
 

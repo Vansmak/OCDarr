@@ -8,7 +8,7 @@ OCDarr automates TV show management in Sonarr based on your viewing activity. It
 - Prefer to keep their media library tidy
 - Don't need to keep entire seasons after watching
 - Want different management rules for different shows
-- Use with overseer or Jellyseer to manage at the episode level insteat of season
+- Use with overseer or Jellyseer to manage at the episode level instead of full season
 
 _Not designed for media hoarders or large household servers with multiple users at different points in series._
 

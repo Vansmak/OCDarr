@@ -1,4 +1,4 @@
-Dev branch not ready yer.  under construction
+Dev branch is developmental, co0nsider it beta
 #  <img src="https://github.com/Vansmak/OCDarr/assets/16037573/f802fece-e884-4282-8eb5-8c07aac1fd16" alt="logo" width="200"/>
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/vansmak)
@@ -45,7 +45,7 @@ _Optional banner view:_
 
 ```bash
 # Pull the image
-docker pull vansmak/ocdarr:latest
+docker pull vansmak/ocdarr:amd64_dev
 
 # Run the container
 docker run -d \
@@ -63,7 +63,7 @@ Option 2: Build from Source
 ```
 git clone https://github.com/Vansmak/OCDarr.git
 cd OCDarr
-git checkout main  # or 'dev' for latest features
+git checkout dev
 docker-compose up -d --build
 ```
 ⚙️ Configuration
@@ -80,7 +80,7 @@ Docker Compose
 version: '3.8'
 services:
   ocdarr:
-    image: vansmak/ocdarr:latest
+    image: vansmak/ocdarr:amd64_dev
     environment:
       - SONARR_URL=${SONARR_URL}
       - SONARR_API_KEY=${SONARR_API_KEY}

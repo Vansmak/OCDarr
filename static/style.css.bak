@@ -1,0 +1,230 @@
+/* Reset and Base Styles */
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll !important; 
+    color: #fff;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Scrollbar Hiding */
+body, 
+.container,
+.series-container,
+.row,
+.settings-subsection,
+.checkbox-list {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+body::-webkit-scrollbar,
+.container::-webkit-scrollbar,
+.series-container::-webkit-scrollbar,
+.row::-webkit-scrollbar,
+.settings-subsection::-webkit-scrollbar,
+.checkbox-list::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Container and Menu Styles */
+.container {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 10px;
+    height: 50px;
+}
+
+.menu span, .menu img {
+    cursor: pointer;
+    color: #FFF;
+    margin: 0 5px;
+    text-decoration: none;
+}
+
+.menu span.active {
+    border-bottom: 2px solid #FFF;
+}
+
+.logo-icon {
+    width: 50px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+/* Series Container and Items */
+.series-container {
+    display: block;
+    width: 100%;
+}
+
+.series-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+/* Banner/Poster Wrapper Base Styles */
+.banner-wrapper {
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+}
+
+.banner-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.banner-wrapper img:hover {
+    opacity: 1;
+}
+
+/* Mode Specific Styles */
+.banner-wrapper.banner-mode {
+    aspect-ratio: 25/6;
+}
+
+.banner-wrapper.banner-mode img {
+    object-fit: contain;
+}
+
+.banner-wrapper.poster-mode {
+    aspect-ratio: 2/3;
+    max-width: 300px;
+}
+
+.banner-wrapper.poster-mode img {
+    object-fit: cover;
+}
+
+/* Series Info Styles */
+.series-info {
+    text-align: center;
+    padding: 5px;
+    width: 100%;
+    margin: 5px auto 0;
+}
+
+.series-info .series-title,
+.series-info .episode-info {
+    display: inline-block;
+    margin: 0;
+}
+
+.episode-info {
+    margin: 5px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.episode-number, 
+.episode-title, 
+.premiere-date {
+    font-size: 12px;
+    margin: 0 5px;
+    word-wrap: break-word;
+}
+
+/* Poster Mode Specific Styles */
+.poster-mode.series-item {
+    padding: 0;
+    margin: 10px;
+    width: fit-content;
+}
+
+/* Responsive Layout */
+@media (max-width: 767px) {
+    /* Mobile Banner Layout */
+    .banner-mode .col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Mobile Poster Layout */
+    .poster-mode .col-12 {
+        flex: 0 0 100%;
+        max-width: 94%;
+        padding: 2px;
+    }
+
+    .poster-mode.series-item {
+        flex-direction: row;
+        align-items: stretch;
+        margin: 10px;
+        padding: 0;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .poster-mode .banner-wrapper {
+        width: 80px;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .poster-mode .banner-wrapper.poster-mode {
+        aspect-ratio: 2/3;
+        max-width: 80px;
+        margin: 0;
+    }
+
+    .poster-mode .series-info {
+        text-align: left;
+        padding-left: 15px;
+        padding-right: 15px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .poster-mode .episode-info {
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 768px) {
+    /* Tablet */
+    .banner-mode .col-12 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
+    .banner-wrapper.poster-mode {
+        max-width: 150px;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Desktop */
+    .banner-mode .col-12 {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
+    
+    /* Updated poster layout for desktop */
+    .poster-mode .col-12 {
+        flex: 0 0 100%;
+        max-width: 300px;
+    }
+}

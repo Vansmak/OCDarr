@@ -1,0 +1,19 @@
+{
+    "rules": {
+        "default": {
+            "get_option": "season",
+            "action_option": "monitor",
+            "keep_watched": "season",
+            "monitor_watched": true,
+            "series": []
+        },
+        "test": {
+            "get_option": "2",
+            "action_option": "search",
+            "keep_watched": "2",
+            "monitor_watched": false,
+            "series": []
+        }
+    },
+    "default_rule": "default"
+}

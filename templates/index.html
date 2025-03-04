@@ -59,6 +59,8 @@
                 <div class="col d-flex justify-content-between">
                     <button onclick="showSettingsSection('service_status')" class="btn btn-secondary">Servers</button>
                     <button onclick="showSettingsSection('rule_management')" class="btn btn-secondary">Rules</button>
+                    <button onclick="showSettingsSection('requests_section')" class="btn btn-secondary">Requests</button>
+
                 </div>
             </div>
 
@@ -79,7 +81,85 @@
                     </table>
                 </div>
             </div>
-
+            <div id="requests_section" class="settings-subsection" style="display: none;">
+                <h4>Show Requests</h4>
+                <div class="requests-container">
+                    {% if pending_requests %}
+                        {% for request in pending_requests %}
+                            <div class="request-card card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">{{ request.title }} - Season {{ request.season }}</h5>
+                                    <span class="badge badge-info">{{ request.episodes|length }} episodes</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="banner-wrapper mb-3">
+                                        <img src="{{ sonarr_url }}/api/v3/mediacover/series/{{ request.series_id }}/banner.jpg?apikey={{ config.get('sonarr_api_key', '') }}" 
+                                             alt="Banner for {{ request.title }}" 
+                                             class="img-fluid banner"
+                                             onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder-banner.png') }}';">
+                                    </div>
+                                    
+                                    <form action="{{ url_for('process_episode_selection') }}" method="POST" class="episode-selection-form">
+                                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                                        
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6>Episode Selection:</h6>
+                                                <div>
+                                                    <button type="button" class="btn btn-sm btn-secondary select-all">Select All</button>
+                                                    <button type="button" class="btn btn-sm btn-secondary select-none">Clear All</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="episode-list row">
+                                                {% for episode in request.episodes %}
+                                                    <div class="col-md-4 mb-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input episode-checkbox" type="checkbox" name="episodes" value="{{ episode.episodeNumber }}" id="ep_{{ request.id }}_{{ episode.episodeNumber }}">
+                                                            <label class="form-check-label" for="ep_{{ request.id }}_{{ episode.episodeNumber }}">
+                                                                {{ episode.episodeNumber }}. {{ episode.title }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between">
+                                            <button type="submit" class="btn btn-primary">Download Selected</button>
+                                            <button type="button" class="btn btn-danger cancel-request">Cancel Request</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-requests-container">
+                            <div class="alert alert-info">No pending requests</div>
+                            
+                            {% if last_processed_show %}
+                                <div class="processing-card card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Processing Downloads</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Processing episodes for {{ last_processed_show.title }} - Season {{ last_processed_show.season }}</p>
+                                        
+                                        <div class="banner-wrapper mb-3">
+                                            <img src="{{ sonarr_url }}/api/v3/mediacover/series/{{ last_processed_show.series_id }}/banner.jpg?apikey={{ config.get('sonarr_api_key', '') }}" 
+                                                 alt="Banner for {{ last_processed_show.title }}" 
+                                                 class="img-fluid banner"
+                                                 onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder-banner.png') }}';">
+                                        </div>
+                                        
+                                        <p class="processing-time">Started {{ last_processed_show.time_ago }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
             <!-- Rule Management Subsection -->
             <div id="rule_management" class="settings-subsection" style="display: none;">
                 <h4>Rules</h4>
@@ -163,6 +243,50 @@
 
         <script type="application/json" id="config-data">{{ config|tojson|safe }}</script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Check if there are pending requests and show the requests section
+                {% if has_pending_requests %}
+                    showSection('settings');
+                    showSettingsSection('requests_section');
+                {% endif %}
+                
+                // Check for success messages
+                var urlParams = new URLSearchParams(window.location.search);
+                var message = urlParams.get('message');
+                var section = urlParams.get('section');
+                var subsection = urlParams.get('subsection');
+                
+                if (message && section === 'settings') {
+                    var messageDiv = document.createElement('div');
+                    messageDiv.className = 'alert alert-success';
+                    messageDiv.textContent = message;
+                    
+                    if (subsection) {
+                        showSettingsSection(subsection);
+                        document.getElementById(subsection).prepend(messageDiv);
+                    } else {
+                        document.getElementById(section).prepend(messageDiv);
+                    }
+                    
+                    // Clear the URL parameters after displaying the message
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    // Automatically remove the alert after 5 seconds
+                    setTimeout(function() {
+                        messageDiv.style.transition = 'opacity 1s';
+                        messageDiv.style.opacity = '0';
+                        
+                        // Remove from DOM after fade out completes
+                        setTimeout(function() {
+                            if (messageDiv.parentNode) {
+                                messageDiv.parentNode.removeChild(messageDiv);
+                            }
+                        }, 1000);
+                    }, 5000);
+                }
+            });
+        </script>
     </div>
 </body>
 </html>

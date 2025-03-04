@@ -1,4 +1,35 @@
 {
+    "services": {
+        "Plex": {
+            "url": "http://192.168.254.205:32400/web",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/plex.png"
+        },
+        "Sonarr": {
+            "url": "http://192.168.254.205:8989",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/sonarr.png"
+        },
+        "Radarr": {
+            "url": "http://192.168.254.205:7878",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/radarr.png"
+        },
+        "Tautulli": {
+            "url": "http://192.168.254.205:8181",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tautulli.png"
+        },
+        "SABnzbd": {
+            "url": "http://192.168.254.205:8080",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/sabnzbd.png"
+        },
+        "Prowlarr": {
+            "url": "http://192.168.254.205:9696",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/prowlarr.png"
+        },
+        "Jellyseer":{
+            "url": "http://192.168.254.205:5055",
+            "icon": "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/prowlarr.png"
+        }
+       
+    },
     "rules": {
         "1n1": {
             "get_option": "1",
@@ -6,53 +37,94 @@
             "keep_watched": "1",
             "monitor_watched": false,
             "series": [
-                "52",
-                "17",
-                "60",
-                "44",
-                "4",
-                "2",
-                "64",
-                "59",
-                "54",
-                "15",
-                "21",
-                "9",
-                "29",
-                "55",
-                "10",
-                "16",
-                "76",
-                "23",
-                "25",
-                "73",
-                "27",
-                "19",
-                "66",
-                "71",
-                "75",
-                "65",
-                "63",
-                "67",
-                "74",
-                "1",
-                "3",
-                "39",
-                "18",
-                "31",
-                "70",
-                "20",
-                "14",
-                "7",
-                "11",
-                "51",
-                "41",
-                "8",
-                "45",
                 "32",
+                "23",
+                "88",
+                "85",
+                "84",
+                "3",
+                "44",
+                "19",
+                "94",
+                "1",
+                "63",
+                "18",
+                "80",
+                "11",
+                "93",
+                "51",
+                "10",
+                "74",
+                "83",
+                "2",
+                "25",
+                "4",
+                "7",
+                "87",
                 "53",
-                "79"
+                "9",
+                "92",
+                "17",
+                "101",
+                "31",
+                "39",
+                "224",
+                "67",
+                "54",
+                "76",
+                "60",
+                "64",
+                "90",
+                "65",
+                "45",
+                "79",
+                "73",
+                "71",
+                "55",
+                "91",
+                "16",
+                "29",
+                "14",
+                "41",
+                "15",
+                "70",
+                "8",
+                "21",
+                "20",
+                "27",
+                "52",
+                "81",
+                "66",
+                "59",
+                "75"
             ]
+        },
+        "none": {
+            "get_option": "0",
+            "action_option": "monitor",
+            "keep_watched": "0",
+            "monitor_watched": false,
+            "series": [
+                "193",
+                "194",
+                "195",
+                "196",
+                "197",
+                "209",
+                "210",
+                "211",
+                "212",
+                "213",
+                "215"
+            ]
+        },
+        "test": {
+            "get_option": "2",
+            "action_option": "monitor",
+            "keep_watched": "2",
+            "monitor_watched": false,
+            "series": []
         }
-    }
+    },
+    "default_rule": "1n1"
 }

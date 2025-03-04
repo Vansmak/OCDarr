@@ -30,6 +30,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application's code to the container
 COPY . /app
 
+# Copy the CA certificate into the container and update the CA certificates
+COPY ./root.crt /usr/local/share/ca-certificates/caddy-root.crt
+RUN update-ca-certificates
+
+# Set REQUESTS_CA_BUNDLE after the CA certificates are correctly updated
+ENV REQUESTS_CA_BUNDLE=/usr/local/share/ca-certificates/caddy-root.crt
+
 # Define environment variables for runtime
 ENV SONARR_URL=http://sonarr.example.com \
     SONARR_API_KEY=apikey_here \

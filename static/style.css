@@ -13,6 +13,93 @@ body {
     padding: 0;
     font-family: Arial, sans-serif;
 }
+.empty-requests-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.processing-card {
+    background-color: rgba(33, 37, 41, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+}
+
+.processing-card .card-header {
+    background-color: rgba(25, 28, 32, 0.8);
+}
+
+.processing-time {
+    font-size: 0.9rem;
+    color: #aaa;
+    font-style: italic;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.8);
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    transition: opacity 1s ease-in-out;
+}
+
+/* Make alerts fade out after 5 seconds */
+@keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+
+/* Add these to your style.css */
+.request-card .banner-wrapper {
+    max-width: 100%;
+    margin-bottom: 15px;
+}
+/* Add to style.css */
+.empty-requests {
+    text-align: center;
+}
+
+.recent-activities-container {
+    margin-top: 20px;
+}
+
+.activity-card {
+    background-color: rgba(33, 37, 41, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s;
+}
+
+.activity-card:hover {
+    transform: translateY(-5px);
+}
+
+.activity-card .card-header {
+    background-color: rgba(25, 28, 32, 0.8);
+}
+
+.badge-primary {
+    background-color: #007bff;
+}
+.request-card .banner {
+    width: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.btn-secondary.active {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+
+/* Ensure alerts don't duplicate */
+.alert-success + .alert-success {
+    display: none;
+}
 
 .container {
     padding: 10px;
@@ -199,4 +286,43 @@ button {
     font-size: 10px;
     color: #ff0000;
     margin-left: 5px;
+}
+.request-card {
+    background-color: rgba(33, 37, 41, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.request-card .card-header {
+    background-color: rgba(25, 28, 32, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.episode-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.episode-checkbox:checked + label {
+    color: #17a2b8;
+    font-weight: bold;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.cancel-request {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.cancel-request:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
 }

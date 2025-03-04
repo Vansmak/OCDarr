@@ -24,6 +24,78 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     loadRule();
+     // Handle Select All buttons
+     document.querySelectorAll('.select-all').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            const form = this.closest('form');
+            form.querySelectorAll('.episode-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        });
+    });
+    
+    // Handle Select None buttons
+    document.querySelectorAll('.select-none').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            const form = this.closest('form');
+            form.querySelectorAll('.episode-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+    });
+    
+    // Handle Cancel Request buttons
+    document.querySelectorAll('.cancel-request').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            if (confirm('Are you sure you want to cancel this request?')) {
+                const form = this.closest('form');
+                const requestId = form.querySelector('input[name="request_id"]').value;
+                
+                // Create a new form for cancellation
+                const cancelForm = document.createElement('form');
+                cancelForm.method = 'POST';
+                cancelForm.action = '/process-episode-selection';
+                
+                // Add the request ID input
+                const requestInput = document.createElement('input');
+                requestInput.type = 'hidden';
+                requestInput.name = 'request_id';
+                requestInput.value = requestId;
+                cancelForm.appendChild(requestInput);
+                
+                // Add the action input
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'cancel';
+                cancelForm.appendChild(actionInput);
+                
+                // Submit the form
+                document.body.appendChild(cancelForm);
+                cancelForm.submit();
+            }
+        });
+    });
+    
+    // Handle form submission with validation
+    document.querySelectorAll('.episode-selection-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const checkedEpisodes = form.querySelectorAll('.episode-checkbox:checked');
+            if (checkedEpisodes.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one episode');
+            } else {
+                // Show confirmation message
+                const seriesTitle = form.closest('.request-card').querySelector('h5').textContent;
+                if (!confirm(`Are you sure you want to download ${checkedEpisodes.length} episodes for ${seriesTitle}?`)) {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
 });
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -64,6 +136,15 @@ function showSettingsSection(subsectionId) {
         subsection.style.display = 'none';
     });
     document.getElementById(subsectionId).style.display = 'block';
+    
+    // Update button highlights
+    document.querySelectorAll('.btn-secondary').forEach(btn => {
+        if (btn.getAttribute('onclick') === `showSettingsSection('${subsectionId}')`) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
 }
 
 function loadRule() {

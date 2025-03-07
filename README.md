@@ -11,6 +11,7 @@ OCDarr automates TV show management in Sonarr based on your viewing activity. It
 - Use with overseer or Jellyseer to manage at the episode level instead of full season
 
 _Not designed for media hoarders or large household servers with multiple users at different points in series._
+_Use is intended for owned media or paid supscription services._
 
 ## 🌟 Features
 

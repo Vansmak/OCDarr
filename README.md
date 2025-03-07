@@ -20,10 +20,15 @@ _Use is intended for owned media or paid supscription services._
 - **Media Server Integration**: 
   - Plex (via Tautulli)
   - Jellyfin (direct integration)
-- **Automatic Tag Matching**: Shows requested through Overseerr/Jellyseerr can automatically use specific rules
+- **Automatic Tag Matching**: Shows requested through Overseerr/Jellyseerr/NZB360 can automatically use specific rules
 - **Space Management**: Optional deletion of watched episodes based on your rules
 - **User Interface**: Clean web interface for managing rules and viewing upcoming content
 - **Containerized**: Easy deployment via Docker
+- ***Request individual episodes
+- ***Make custom requests
+- ***Request from popular tmdb tests
+- ***added Radarr w\o rule management
+- ***Server page with links to your services
 
 ### Interface Preview
 ![OCDarr Interface](https://github.com/Vansmak/OCDarr/assets/16037573/5491d694-2e9a-46fb-a1f8-539dcaf661df)
@@ -100,7 +105,7 @@ services:
 Create rules using the OCDarr website (start with Default rule)
 Rules define how OCDarr manages each show. Each rule has four components:
 
-Get Option (get_option):
+Get Option (get_option):  //breaking changes, labels are different than main branch, edit your config.json to match
 
     1 - Get only the next episode
     3 - Get next three episodes
@@ -134,23 +139,18 @@ Shows can get rules in three ways:
 
 Default Rule: Applied if no other rule matches
   This is the first rule you should edit to how you want most shows added as it will be applied if no other rule is 
+  for example my Default rule is 
+   ```
+    "rules": {
+        "Default": {
+            "get_option": "1",
+            "action_option": "search",
+            "keep_watched": "1",
+            "monitor_watched": true,
+   ```
 Manual Assignment: Through OCDarr's web interface
-Automatic via Tags: When requesting shows through Overseerr/Jellyseerr
-
-Tag-Based Rules
-When you create a rule in OCDarr, it automatically creates a matching tag in Sonarr. When requesting shows through Overseerr:
-
-Add a tag matching your rule name
-When the show is added to Sonarr, OCDarr will automatically apply that rule
-
-
-
-Example:
-
-Create rule named "pilots"
-Tag new show requests with "pilots"
-Show will automatically follow the "pilots" rule when added
-
+Automatic via Tags: When requesting shows through Overseerr/Jellyseerr if you dont add a tag then it will goto default.  
+  If you use the "episodes" tag it will apply no rule and present you a form to select episodes you want, this is intended for one offs, not ongoing watch as you go
 ## 🔗 Media Server Integration
 
 ### Plex (via Tautulli) Setup

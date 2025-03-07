@@ -33,8 +33,6 @@ _Use is intended for owned media or paid supscription services._
 ### Interface Preview
 ![OCDarr Interface](https://github.com/Vansmak/OCDarr/assets/16037573/5491d694-2e9a-46fb-a1f8-539dcaf661df)
 
-_Optional banner view:_
-![Banner View](https://github.com/user-attachments/assets/7db48f4e-7364-46c5-9c8b-449ddaed4de5)
 
 ## 📋 Requirements
 
@@ -76,10 +74,17 @@ docker-compose up -d --build
 Environment Variables
 Create a .env file:
 ```
-SONARR_URL=http://sonarr.example.com
+SONARR_URL=http://sonarraddress
 SONARR_API_KEY=your_sonarr_api_key
-USE_POSTERS=true    # or false for banner view
-CLIENT_ONLY=false   # true for viewing-only mode without management
+
+JELLYSEERR_URL=http://jellyoroverseeraddress #LEAVE LABEL AS JELLYSEER BUT USE YOU OVERSEER URL AND API
+JELLYSEERR_API_KEY=jellyseeorOrOverseerkey
+
+RADARR_URL=http://radarraddress
+RADARR_API_KEY=radarrkey
+
+TMDB_API_KEY=reallylongkey
+
 ```
 Docker Compose
 ```
@@ -90,6 +95,11 @@ services:
     environment:
       - SONARR_URL=${SONARR_URL}
       - SONARR_API_KEY=${SONARR_API_KEY}
+      - JELLYSEERR_URL=${JELLYSEERR_URL}
+      - JELLYSEERR_API_KEY=${JELLYSEERR_API_KEY}
+      - RADARR_URL=${RADARR_URL}
+      - RADARR_API_KEY=${RADARR_API_KEY}
+      - TMDB_API_KEY=${TMDB_API_KEYL}
       - CONFIG_PATH=/app/config/config.json
     env_file:
       - .env
